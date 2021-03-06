@@ -3,17 +3,26 @@
 This is a simple network engine.
 Phase 1: Peer to Peer networking 
 
+# setup 
+define the VCPKG_ROOT in Environment 
+```
+export VCPKG_ROOT=/Users/JohnDoe/workspace/cpp/vcpkg
+```
+
 # How to 
 - create the GCC project: `./script/gen_prj.sh`  # used cmake here
 - build the GCC project: `./script/build.sh` 
 - run the GCC project: `./script/app1`
 
 # File Organisation 
-./CoreLib       - the Core Library 
+./Library       - the Library folder
+    ./CoreLib           - the Core Library 
+    ./NetworkEngine     - Network Engine Layer
 ./MyApp         - the Main application
 ./UnitTest      - Unit Tests 
 ./doc           - Document folder 
-./NetCoreLib    - Network Engine Layer
+
+
 
 # Code Convention (Draft)
 ## Naming 

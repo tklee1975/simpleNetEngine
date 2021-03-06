@@ -14,7 +14,8 @@ set(NET_ENGINE_PATH     "Library/NetEngine")
 
 #find_package(fmt CONFIG REQUIRED)
 
-
+## Vcpkg 
+find_package(fmt CONFIG REQUIRED)
 
 ## Define the library and main source 
 add_subdirectory(${CORE_LIB_PATH})
@@ -28,4 +29,5 @@ target_precompile_headers(app1 PRIVATE ${DEMO1_PATH}/pch.h)
 
 target_link_libraries(app1 PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(app1 PRIVATE ${NET_ENGINE_NAME})
-#target_link_libraries(app1 PRIVATE fmt::fmt-header-only)
+#target_link_libraries(app1 PRIVATE fmt::fmt-header-only) # ken: when to use this?
+target_link_libraries(app1 PRIVATE fmt::fmt)

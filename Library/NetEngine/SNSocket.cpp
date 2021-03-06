@@ -5,6 +5,7 @@
 //  Created by kenlee on 6/3/2021.
 //
 
+
 #include "SNSocket.h"
 #include <iostream>
 #include <unistd.h>
@@ -63,7 +64,7 @@ public:
     }
 
     static void init() {
-        static MySocketInit s;
+        static SNSocketInit s;
     }
 #else
     static void init() {
@@ -91,7 +92,6 @@ void SNSocket::createTCP()
 {
     close();
 
-//    MySocketInit::init();
     _sock = ::socket(AF_INET, SOCK_STREAM, 0);
     if (_sock == INVALID_SOCKET) {
         // throw std::exception("createTCP");
@@ -114,29 +114,6 @@ bool SNSocket::bind(const SNSocketAddr& addr)
     return true;
 }
 
-
-void SNSocket::recv(std::vector<char> & buf, size_t bytesToRecv)
-{
-    buf.clear();
-    if (bytesToRecv > INT_MAX) {
-        std::cout << "recv bytesToRecv is too big\n";
-        //throw MyError("recv bytesToRecv is too big");
-        return;
-    }
-    
-    buf.resize(bytesToRecv);
-
-    SNSocketAddr addr;
-    socklen_t addrLen = sizeof(addr._addr);
-    int ret = ::recvfrom(_sock, buf.data(),
-                        (int)bytesToRecv, 0, &addr._addr, &addrLen);
-    if (ret < 0) {
-        std::cout << "recv error: " << ret << "\n";
-        //throw MyError("recv");
-        return;
-    }
-    std::cout << ret << " byte received\n";
-}
 
 
 bool SNSocket::listen(int backLog)
@@ -164,7 +141,7 @@ bool SNSocket::accept(SNSocket &acceptedSocket)
         return false;
     }
 
-    printf("accept\n");
+    // printf("accept\n");
     acceptedSocket._sock = c;
     return true;
 }
@@ -186,6 +163,47 @@ void SNSocket::send(const char* data, size_t dataSize)
     return;
 }
 
+
+size_t SNSocket::availableBytesToRead()
+{
+#ifdef _WIN32
+    u_long n = 0;
+    if (0 != ::ioctlsocket(_sock, FIONREAD, &n)) {
+        throw SNError("availableBytesToRead");
+    }
+    
+    return static_cast<size_t>(n);
+#else
+    int n = 0;
+    
+    // io control: FIONREAD,
+    // returns the number of data bytesin the location pointed
+    if (0 != ::ioctl(_sock, FIONREAD, &n)) {
+        throw SNError("availableBytesToRead");
+    }
+
+    return static_cast<size_t>(n);
+#endif
+    return 0;
+}
+
+
+
+void SNSocket::recv(std::vector<char> & buf, size_t bytesToRecv) {
+    buf.clear();
+    
+    if (bytesToRecv > INT_MAX) {
+        throw SNError("recv: bytesToRecv is too big");
+    }
+    
+    buf.resize(bytesToRecv);
+
+    int ret = ::recv(_sock, buf.data(), (int)bytesToRecv, 0);
+    if (ret < 0) {
+        throw SNError("recv: fail to recv");
+    }
+
+}
 
 
 

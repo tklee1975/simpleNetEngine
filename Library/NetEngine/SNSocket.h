@@ -8,8 +8,20 @@
 #ifndef SNSocket_hpp
 #define SNSocket_hpp
 
-#include <arpa/inet.h> // htons
-#include <sys/socket.h>
+#ifdef _WIN32
+    #include <Winsock2.h> // must include before windows.h
+    #include <Windows.h>
+    #include <conio.h>
+    #include <ws2tcpip.h> // getaddrinfo
+    #pragma comment(lib, "Ws2_32.lib")
+#else
+    #include <unistd.h> // sleep()
+    #include <arpa/inet.h> // htons
+    #include <sys/socket.h>
+    #include <netdb.h> // struct addrinfo
+    #include <sys/ioctl.h>
+#endif
+
 #include <vector>
 
 #pragma once
@@ -55,6 +67,8 @@ public:
     void recv(std::vector<char> & buf, size_t bytesToRecv);
     bool accept(SNSocket &acceptedSocket);
     void send(const char* data, size_t dataSize);
+    size_t availableBytesToRead();
+    
     
 private:
     SOCKET _sock = INVALID_SOCKET;

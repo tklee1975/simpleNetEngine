@@ -21,8 +21,8 @@ set(UNIT_TEST_PATH      "UnitTest")
 
 ## Vcpkg 
 find_package(fmt CONFIG REQUIRED)
-find_package(eastl CONFIG REQUIRED)
-find_package(eabase CONFIG REQUIRED)
+find_package(EASTL CONFIG REQUIRED)
+find_package(EABase CONFIG REQUIRED)
 
 ## Define the library and main source 
 add_subdirectory(${CORE_LIB_PATH})
@@ -38,6 +38,9 @@ target_precompile_headers(app1 PRIVATE ${DEMO1_PATH}/pch.h)
 target_link_libraries(app1 PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(app1 PRIVATE ${NET_ENGINE_NAME})
 target_link_libraries(app1 PRIVATE fmt::fmt)
+target_link_libraries(app1 PRIVATE EASTL)
+target_link_libraries(app1 PRIVATE EABase)
+
 
 # For Testing 
 add_executable(test_main ${UNIT_TEST_PATH}/TestMain.cpp)
@@ -45,6 +48,7 @@ target_link_libraries(test_main PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(test_main PRIVATE ${NET_ENGINE_NAME})
 target_link_libraries(test_main PRIVATE fmt::fmt)
 target_link_libraries(test_main PRIVATE EASTL)
+target_link_libraries(test_main PRIVATE EABase)
 
 # now register the executable with CTest
 #add_test(NAME my_test COMMAND my_test)

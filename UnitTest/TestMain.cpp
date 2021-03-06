@@ -11,9 +11,87 @@ using namespace std;
 
 // ken: not working yet 
 // void testEastlVector() {
-//     std::cout << "Eastl Vector\n"; 
+//     std::cout << "Eastl Vector\n";
 //     fixed_set<int, 25> intSet; // Create a set capable of holding 25 elements.
 // }
+
+void testSimpleString() {
+    SNString str = SNString("Hello Str");
+    
+    cout << "str: " << str.str() << "\n";
+    
+    std::vector<char> vecBuf;
+    
+    str.copyTo(vecBuf);
+    vecBuf.push_back('\0');
+    
+    cout << "vecBuf: " << vecBuf.data() << "\n";
+}
+
+//
+// this is a simple Hello server
+//  Run this and
+//  use telnet 3000 to access it
+//
+void testSimpleEchoServer() {
+    SNSocketAddr addr;
+    addr.setIPv4(0,0,0,0);
+    addr.setPort(3000);
+
+    SNSocket serverSocket;
+    serverSocket.createTCP();
+    if(serverSocket.bind(addr) == false) {
+        std::cout << "Fail to bind\n";
+        return;
+    }
+    if(serverSocket.listen(10) == false) {
+        std::cout << "Fail to listen\n";
+        return;
+    }
+    
+    SNSocket clientSocket;
+    
+    bool isAccepted = serverSocket.accept(clientSocket);
+    if(isAccepted == false) {
+        std::cout << "Client fail to accept\n";
+        return;
+    }
+    std::cout << "Client success to accept\n";
+        
+    std::vector<char> buf;
+    std::vector<char> outBuf;
+    for(;;) {
+        size_t n = clientSocket.availableBytesToRead();
+        if(n <= 0) {
+            sleep(1);
+            continue;
+        }
+        
+        clientSocket.recv(buf, n);
+        buf.push_back(0);   // add the character '\0' to make it a string
+
+        
+        
+        //std::cout << "Byte Read: " << ((int) n) << " input: " << buf << "\n";
+        const char *msg = (const char *) buf.data();
+        std::cout << " input: " << msg << "\n";
+
+        SNString returnMsg = SNString("ECHO: ");
+        returnMsg.append(msg);
+        
+        //outBuf = "ECHO: ";
+        returnMsg.copyTo(outBuf);
+        
+        clientSocket.send(outBuf.data(), outBuf.size());
+    }
+    
+    
+    clientSocket.close();
+    serverSocket.close();
+   
+
+}
+
 
 //
 // this is a simple Hello server
@@ -102,7 +180,10 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testSimpleHelloServer();
+    //testSimpleString();
+    //testEastlVector();
+    testSimpleEchoServer();
+    // testSimpleHelloServer();
     // testTcpBind();
     // testSockAddr();
     // testLog();
@@ -114,7 +195,7 @@ void runSingleTest() {
 void runAllTest() {
     std::cout << "Run All Test\n";
     
-
+    //testEastlVector();
     testTcpBind();
     testSockAddr();
     testLog();

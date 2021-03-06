@@ -9,6 +9,10 @@ message("Network Engine Library")
 
 # Define Source 
 
+set(CORE_LIB_NAME       "CoreLib")
+set(CORE_LIB_PATH       "Library/CoreLib")
+
+
 ## Fetch the sources and add the the library
 file(GLOB_RECURSE search_src_files 
 	"*.cpp"
@@ -28,3 +32,4 @@ add_library(NetEngine ${search_src_files})
 
 # Define the Target 
 target_include_directories(NetEngine PUBLIC ./)
+target_link_libraries(NetEngine PRIVATE ${CORE_LIB_NAME})

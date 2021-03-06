@@ -1,8 +1,8 @@
 # TODO List 
 
 ## Top List 
+[18] install eastl 
 
-[2] Add Unit Test Support 
 [3] Add Socket Server (bind a port)
 [4] Add Socket Client (join the server)
 [5] Close Socket 
@@ -19,8 +19,10 @@
 [15] Exchange NetworkEvent
 [16] Closing the session
 [17] Change Shell script to python ??
+[19] Custom Socket class
 
 ## Fixed 
+[2] Add Unit Test Support  - done 
 
 [1] Fix gen_prj.sh hard code - done 
 turn `VCPKG_ROOT=/Users/kenlee/workspace/cpp/vcpkg`

@@ -3,4 +3,6 @@
 
 #define KC_NET_ENGINE_VERSION     "0.0.1"
 
+#include "SNSocket.h"
+
 #endif 

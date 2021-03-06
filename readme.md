@@ -22,6 +22,8 @@ export VCPKG_ROOT=/Users/JohnDoe/workspace/cpp/vcpkg
 ./UnitTest      - Unit Tests 
 ./doc           - Document folder 
 
+## Class Prefix 
+SN - Standard for Simple Network 
 
 
 # Code Convention (Draft)

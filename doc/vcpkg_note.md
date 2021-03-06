@@ -10,4 +10,5 @@ cd vcpkg
 ## Setup Fmt 
 Reference: 
 - https://fmt.dev/dev/usage.html
+https://fmt.dev/latest/index.html
 `vcpkg install fmt`

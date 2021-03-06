@@ -14,5 +14,8 @@ int main() {
     fmt::print("Corelib Version: {}.\n", KC_CORE_LIB_VERSION);
     fmt::print("NetEngine Version: {}.\n", KC_NET_ENGINE_VERSION);
     
+    simpleNet::log("Server is started!");
+    
+    
     return 0;
 }

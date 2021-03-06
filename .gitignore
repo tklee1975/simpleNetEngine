@@ -15,3 +15,7 @@ _deps
 
 ## For Build output
 build
+xcode_prj
+
+## VSCode 
+.vscode

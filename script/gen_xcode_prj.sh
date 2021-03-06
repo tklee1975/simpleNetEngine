@@ -1,0 +1,10 @@
+# Clean up 
+
+VCPKG_ROOT=`echo $VCPKG_ROOT`
+
+echo "Your VCPCK_ROOT=$VCPKG_ROOT"
+CMAKE_SCRIPT=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake 
+
+#cmake -GXcode DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -B ./xcode_prj/ -D CMAKE_TOOLCHAIN_FILE=$CMAKE_SCRIPT ./
+cmake -GXcode -DBUILD_SHARED_LIBS=TRUE -B ./xcode_prj/ -D CMAKE_TOOLCHAIN_FILE=$CMAKE_SCRIPT ./
+

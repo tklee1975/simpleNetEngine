@@ -132,6 +132,16 @@ bool SNSocket::listen(int backLog)
 }
 
 
+void SNSocket::connect(const SNSocketAddr& addr)
+{
+    int ret = ::connect(_sock, &addr._addr, sizeof(addr._addr));
+    if (ret < 0) {
+        throw SNError("connect");
+    }
+    log("connect: Socket connected");
+}
+
+
 bool SNSocket::accept(SNSocket &acceptedSocket)
 {
     acceptedSocket.close();

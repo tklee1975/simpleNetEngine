@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 
 project(SimpleNet)
 
+set(CMAKE_CXX_STANDARD 17)
+
 # tell CMake to use CTest extension
 enable_testing()
+
 
 ## Variable Setup 
 set(DEMO1_BIN_NAME      "app1")
@@ -23,13 +26,19 @@ set(UNIT_TEST_PATH      "UnitTest")
 find_package(fmt CONFIG REQUIRED)
 find_package(EASTL CONFIG REQUIRED)
 find_package(EABase CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 ## Define the library and main source 
 add_subdirectory(${CORE_LIB_PATH})
 add_subdirectory(${NET_ENGINE_PATH})
 
 ## Define 
-add_executable(app1 ${DEMO1_PATH}/Main.cpp ${DEMO1_PATH}/pch.h)
+add_executable(app1
+                ${DEMO1_PATH}/Main.cpp
+                ${DEMO1_PATH}/pch.h
+                ${DEMO1_PATH}/SimpleSocketServer.cpp
+                ${DEMO1_PATH}/SimpleSocketServer.h
+            )
 
 
 ## Setup Compile and Link 
@@ -40,7 +49,7 @@ target_link_libraries(app1 PRIVATE ${NET_ENGINE_NAME})
 target_link_libraries(app1 PRIVATE fmt::fmt)
 target_link_libraries(app1 PRIVATE EASTL)
 target_link_libraries(app1 PRIVATE EABase)
-
+target_link_libraries(app1 PRIVATE imgui::imgui)
 
 # For Testing 
 add_executable(test_main ${UNIT_TEST_PATH}/TestMain.cpp)
@@ -49,8 +58,12 @@ target_link_libraries(test_main PRIVATE ${NET_ENGINE_NAME})
 target_link_libraries(test_main PRIVATE fmt::fmt)
 target_link_libraries(test_main PRIVATE EASTL)
 target_link_libraries(test_main PRIVATE EABase)
+target_link_libraries(test_main PRIVATE imgui::imgui)
 
 # now register the executable with CTest
 #add_test(NAME my_test COMMAND my_test)
+
+# find_package(imgui CONFIG REQUIRED)
+#     target_link_libraries(main PRIVATE imgui::imgui)
 
 

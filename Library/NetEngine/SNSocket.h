@@ -62,6 +62,7 @@ public:
     void close();
 
     bool bind(const SNSocketAddr& addr);
+    void connect(const SNSocketAddr& addr);
     bool listen(int backLog);
     void send(const SNSocketAddr& addr, const char* data, size_t dataSize);
     void recv(std::vector<char> & buf, size_t bytesToRecv);

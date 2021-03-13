@@ -20,7 +20,7 @@ void startEchoServer() {
     auto sessionFactory = new simpleNet::SNEchoSessionFactory();
     
     server.setSessionFactory(sessionFactory);
-    server.start(1234);
+    server.start(2345);
 }
 
 

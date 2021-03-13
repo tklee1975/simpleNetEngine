@@ -58,7 +58,8 @@ void SNRequestServer::start(int port)
     std::cout << "Client success to accept\n";
     
     SNSession *session = _factory->create(&clientSocket);
-        
+    session->setConnected(/* isHost */ true); 
+
     std::vector<char> buf;
     std::vector<char> outBuf;
     for(;;) {

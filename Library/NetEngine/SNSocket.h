@@ -8,6 +8,8 @@
 #ifndef SNSocket_hpp
 #define SNSocket_hpp
 
+
+
 #ifdef _WIN32
     #include <Winsock2.h> // must include before windows.h
     #include <Windows.h>
@@ -27,6 +29,12 @@
 #pragma once
 
 namespace simpleNet {
+
+enum SNSocketAcceptStatus {
+    SNSocketAcceptSuccess = 1,
+    SNSocketAcceptPending = 0,
+    SNSocketAcceptFail = -1,
+};
 
 class SNSocketAddr {
 public:
@@ -67,9 +75,12 @@ public:
     void send(const SNSocketAddr& addr, const char* data, size_t dataSize);
     void recv(std::vector<char> & buf, size_t bytesToRecv);
     bool accept(SNSocket &acceptedSocket);
+    SNSocketAcceptStatus attempAccept(SNSocket &acceptedSocket);
+    
     void send(const char* data, size_t dataSize);
     size_t availableBytesToRead();
-    
+    int getSockFd();
+    void setNonBlock(bool flag);
     
 private:
     SOCKET _sock = INVALID_SOCKET;

@@ -12,6 +12,10 @@ SNEchoSession::SNEchoSession(SNSocket *sock) : SNSession(sock)
 {
 }
 
+void SNEchoSession::onConnect()
+{
+    sendString("Welcome to Echo server\n");
+}
 
 void SNEchoSession::onRecvData(std::vector<char> &buf, size_t &nRead)
 {

@@ -1,15 +1,16 @@
 # TODO List 
 
 ## Top List 
-[18] install eastl 
 
-[3] Add Socket Server (bind a port)
-[4] Add Socket Client (join the server)
+[22] Create a text-base Client/Server module for Main App Logic
+[20] Study Non-blocking IO 
+[19] Make a text base client to talk with EchoServer
+[18] install eastl 
 [5] Close Socket 
 [*6] Testing Text Message Mode Client/Server 
 [7] Design Network Layer API (any reference)
 [8] Build the Network layer API 
-[9] Install IMGUI
+[9] Install IMGUI - 50%
 [10] Study the control of IMGUI 
 [11] Study the drawing of IMGUI 
 [12] Setup Interactive test on IMGUI 
@@ -22,9 +23,13 @@
 [19] Custom Socket class
 
 ## Fixed 
+[21] Refactor SNSession Architecture to support Non-block IO  - done 
+
 [2] Add Unit Test Support  - done 
 
 [1] Fix gen_prj.sh hard code - done 
 turn `VCPKG_ROOT=/Users/kenlee/workspace/cpp/vcpkg`
 to a non hard-code stuff??
+[3] Add Socket Server (bind a port)
+[4] Add Socket Client (join the server)
 

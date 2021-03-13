@@ -64,6 +64,8 @@ void SimpleSocketServer::start(int port)
         const char *msg = (const char *) buf.data();
         std::cout << " input: " << msg << "\n";
 
+    //sleep(1);
+
         SNString returnMsg = SNString("ECHO: ");
         returnMsg.append(msg);
         

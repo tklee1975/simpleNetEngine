@@ -6,6 +6,7 @@
 //
 
 #include "SNSession.h"
+#include <fcntl.h> /* Added for the nonblocking socket */
 
 namespace simpleNet {
 
@@ -24,8 +25,6 @@ SNSession::~SNSession()
     }
 }
     
-
-
 void SNSession::onRecvData(std::vector<char> &buf, size_t &nRead)
 {
     // Need implemented by child class
@@ -46,10 +45,17 @@ size_t SNSession::availableBytesToRead()
     return _socket->availableBytesToRead();
 }
 
+void SNSession::setConnected(bool isHostFlag)
+{
+    isHost = isHostFlag;
+    onConnect();
+}
+
 void SNSession::receiveData() {
     size_t nRead = availableBytesToRead();
-    if(nRead == 0) {
-        sleep(1);   // 1 second
+    // log("SNSession.receiveData: nRead=%d", nRead);
+    if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
+        //sleep(1);       // 1 second     //
         return;
     }
     
@@ -67,9 +73,31 @@ void SNSession::close() {
         _socket->close();
     }
 }
+
+bool SNSession::isConncting(size_t &availableByte)
+{
+    size_t result = availableBytesToRead();
+    //log("SNSession.isConncting: nRead=%d", result);
+    
+    // KEN: todo: Check for disconnection
+    
+    
+//    if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
+//        return false;
+//    }
+    availableByte = result;
+    return true;
+}
+
 bool SNSession::isAlive() {
     //log("SNSession: isAlive: %d", _isAlive);
     return _isAlive;
+}
+
+void SNSession::sendString(const char *str)
+{
+    SNString s = SNString(str); // KEN: FIXME: how to write better?
+    sendString(s);
 }
 
 void SNSession::sendString(SNString &str)

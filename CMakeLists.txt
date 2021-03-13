@@ -52,7 +52,11 @@ target_link_libraries(app1 PRIVATE EABase)
 target_link_libraries(app1 PRIVATE imgui::imgui)
 
 # For Testing 
-add_executable(test_main ${UNIT_TEST_PATH}/TestMain.cpp)
+add_executable(test_main
+                    ${UNIT_TEST_PATH}/TestMain.cpp
+                    ${UNIT_TEST_PATH}/TestNetSession.cpp
+                    ${UNIT_TEST_PATH}/TestNetSession.h
+            )
 target_link_libraries(test_main PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(test_main PRIVATE ${NET_ENGINE_NAME})
 target_link_libraries(test_main PRIVATE fmt::fmt)

@@ -8,9 +8,126 @@
 #include <EASTL/fixed_vector.h>
 #include <fmt/core.h>
 #include <session/SNEchoSession.h>
+#include "TestNetSession.h"
+#include <fcntl.h> /* Added for the nonblocking socket */
+
 
 using namespace simpleNet;
 using namespace std;
+
+void testSampleClientSession()
+{
+    
+    SNClient client = simpleNet::SNClient();
+    
+    
+    client.setSessionFactory(new SampleNetSessionFactory(false));
+    
+    SNSocketAddr addr;
+    addr.setIPv4(127, 0, 0, 1);
+    addr.setPort(5433);
+
+    bool isSuccess = client.connectServer(addr);
+    
+    if(isSuccess == false) {
+        std::cout << "Fail to connect the server\n";
+        return;
+    }
+
+    int counter = 0;
+    std::cout << "Starting the Network Loop\n";
+    for(;;) {
+        client.checkNetwork();
+        counter++;
+
+        if((counter % 500000) == 0) {
+            SNSession *session = client.getSession();
+            if(session != NULL) {
+                session->sendString("Client: tick passed\n");
+            }
+            //host.getSession()->sendString("100 tick passed");
+            //sendString("100 tick passed");
+        }
+        //sleep(1);
+    }
+    
+}
+
+
+
+void testSampleHostSession() 
+{
+    
+    SNHost host = simpleNet::SNHost();
+    
+    
+    host.setSessionFactory(new SampleNetSessionFactory(true));
+    
+    
+    bool isSuccess = host.bindPort(5433);
+    if(isSuccess == false) {
+        std::cout << "Fail to bind the port\n";
+        return;
+    }
+    
+    int counter = 0;
+    std::cout << "Starting the Network Loop\n";
+    for(;;) {
+        host.checkNetwork();
+        counter++;
+        
+        if((counter % 1000000) == 0) {
+            SNSession *session = host.getSession();
+            if(session != NULL) {
+                session->sendString("100 tick passed\n");
+            }
+            //host.getSession()->sendString("100 tick passed");
+            //sendString("100 tick passed");
+        }
+        //sleep(1);
+    }
+    
+}
+
+
+void testClientWithSession() {
+    SNSocket sock;
+
+    sock.createTCP();
+    SNSocketAddr addr;
+    addr.setIPv4(127, 0, 0, 1);
+    addr.setPort(2345);
+
+    sock.connect(addr);
+    
+    auto factory = TestEchoClientSessionFactory();
+    SNSession *session = factory.create(&sock);
+
+    session->setConnected(/* isHost */ false);
+    
+    
+//    sock.send_c_str("GET /index.html HTTP/1.1\r\n"
+//                        "Host: www.gov.hk\r\n"
+//                        "\r\n");
+    
+    std::vector<char> buf;
+    for(;;) {
+        if(session->isAlive() == false) {
+            break;
+        }
+        session->receiveData();  // ken: sleep inside if no data received
+    }
+}
+
+void testCin() {
+    std::cout << "Please input a string\n";
+    std::string input;
+    
+    std::cin >> input;
+    
+    std::cout << "Your input: " << input << "\n";
+}
+
 
 void testClient() {
     SNSocket sock;
@@ -92,6 +209,92 @@ void test() {
 
 }
 
+// https://man7.org/linux/man-pages/man2/fcntl.2.html
+//  fcnctl = File Control
+//
+void setNonblock(int socket)
+{
+    int flags;
+    flags = fcntl(socket ,F_GETFL,0);   // F_GETFL =  Get the file access mode
+                                        //           and the file status flags;
+    assert(flags != -1);
+    fcntl(socket, F_SETFL, flags | O_NONBLOCK);     // Set the mode to nonBlock
+}
+// Reference:
+//  https://stackoverflow.com/questions/6714425/simple-socket-non-blocking-i-o/6714551
+//  http://www.cs.tau.ac.il/~eddiea/samples/Non-Blocking/tcp-nonblocking-server.c.html
+//  http://beej.us/guide/bgnet/
+//  https://luminousmen.com/post/asynchronous-programming-blocking-and-non-blocking
+void testNonBlockingServer() {
+    SNSocketAddr addr;
+    addr.setIPv4(0,0,0,0);
+    addr.setPort(3458);
+    
+    std::cout << "Testing NonBlocking Server\n";
+
+    SNSocket serverSocket;
+    serverSocket.createTCP();
+    
+    serverSocket.setNonBlock(true);
+    
+    std::cout << "Start Bind\n";
+    if(serverSocket.bind(addr) == false) {
+        std::cout << "Fail to bind\n";
+        return;
+    }
+    std::cout << "Done Bind\n";
+    
+    
+    std::cout << "Start Listen\n";
+    if(serverSocket.listen(10) == false) {
+        std::cout << "Fail to listen\n";
+        return;
+    }
+    std::cout << "Done Listen\n";
+    
+    SNSocket clientSocket;
+    auto factory = SNEchoSessionFactory();
+    
+    
+    std::cout << "Before Accept\n";
+    for(;;) {
+        SNSocketAcceptStatus result = serverSocket.attempAccept(clientSocket);
+        if(result == SNSocketAcceptFail) {// No pending
+            std::cout << "Client fail to accept\n";
+            return;
+        }
+        
+        if(result == SNSocketAcceptSuccess) {// No pending
+            break;
+        }
+    
+        std::cout << "Waiting Connection\n";
+        sleep(1);
+    }
+    std::cout << "After Accept\n";
+    
+    
+    // setNonblock(clientSocket.getSockFd());
+    std::cout << "Client success to accept\n";
+    
+    SNSession *session = factory.create(&clientSocket);
+        
+    std::vector<char> buf;
+    std::vector<char> outBuf;
+    for(;;) {
+        if(session->isAlive() == false) {
+            break;
+        }
+        std::cout << "Before Receiver Data\n";
+        session->receiveData();  // ken: sleep inside if no data received
+        std::cout << "After Receiver Data\n";
+    }
+    
+    
+    serverSocket.close();
+}
+
+
 void testEchoServer() {
     SNSocketAddr addr;
     addr.setIPv4(0,0,0,0);
@@ -160,7 +363,7 @@ void testServerUsingSession() {
     }
     std::cout << "Client success to accept\n";
     
-    SNSession session = SNSession(&clientSocket);
+    SNEchoSession session = SNEchoSession(&clientSocket);
         
     std::vector<char> buf;
     std::vector<char> outBuf;
@@ -327,8 +530,13 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
+    // testCin();
     // testIMGUI();             // ken: not ready
-    testClient();
+    testSampleClientSession();
+    // testSampleHostSession();
+    // testNonBlockingServer();
+    // testClientWithSession();
+    // testClient();
     // testEchoServer();
     //testServerUsingSession();
     //testSimpleString();
@@ -347,6 +555,7 @@ void runAllTest() {
     std::cout << "Run All Test\n";
     
     //testEastlVector();
+
     testTcpBind();
     testSockAddr();
     testLog();

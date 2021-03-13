@@ -17,7 +17,10 @@ namespace simpleNet {
 class SNEchoSession : public SNSession {
 public:
     SNEchoSession(SNSocket *);
+    
+protected:
     virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
+    virtual void onConnect();
 };
 
 class SNEchoSessionFactory : public SNSessionFactory {

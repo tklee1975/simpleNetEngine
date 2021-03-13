@@ -5,7 +5,9 @@
 
 #include "SNSocket.h"
 #include "SNSession.h"
-#include "server/SNRequestServer.h"
+#include "component/SNRequestServer.h"
+#include "component/SNHost.h"
+#include "component/SNClient.h"
 #include "session/SNEchoSession.h"
 
 

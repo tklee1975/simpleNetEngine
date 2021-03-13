@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <exception>
 #include <CoreLib.h>
+#include <fcntl.h> /* Added for the nonblocking socket */
 
 #define BACKLOG 10
 
@@ -71,6 +72,26 @@ public:
     }
 #endif
 };
+
+int SNSocket::getSockFd()
+{
+    return _sock;
+}
+
+void SNSocket::setNonBlock(bool nonBlock)
+{
+    int flags;
+    flags = ::fcntl(_sock ,F_GETFL,0);   // F_GETFL =  Get the file access mode
+                                        //           and the file status flags;
+    //assert(flags != -1);
+    if(nonBlock) {
+        ::fcntl(_sock, F_SETFL, flags | O_NONBLOCK);     // Set the mode to nonBlock
+        //::fcntl(_sock, F_SETFL, flags |);     // Set the mode to nonBlock
+    } else {
+        fcntl(_sock, F_SETFL, flags & ~O_NONBLOCK);    // unset nonBlocking flag
+        
+    }
+}
 
 /**
  SNSocket
@@ -136,9 +157,35 @@ void SNSocket::connect(const SNSocketAddr& addr)
 {
     int ret = ::connect(_sock, &addr._addr, sizeof(addr._addr));
     if (ret < 0) {
+        log("connect: fail to connect: %d; error=%d", ret, errno);
         throw SNError("connect");
     }
     log("connect: Socket connected");
+}
+
+SNSocketAcceptStatus SNSocket::attempAccept(SNSocket &acceptedSocket)
+{
+    acceptedSocket.close();
+
+    // https://jameshfisher.com/2017/04/05/set_socket_nonblocking/
+    int value = ::accept(_sock, nullptr, nullptr);
+    if(value == -1) {
+        if (errno == EWOULDBLOCK) {
+            return SNSocketAcceptPending;
+        }
+        return SNSocketAcceptFail;
+    }
+    
+    acceptedSocket._sock = value;
+    
+    return SNSocketAcceptSuccess;
+//    if (c == INVALID_SOCKET) {
+//        return false;
+//    }
+//
+//    // printf("accept\n");
+//    acceptedSocket._sock = c;
+//    return true;
 }
 
 
@@ -188,7 +235,9 @@ size_t SNSocket::availableBytesToRead()
     
     // io control: FIONREAD,
     // returns the number of data bytesin the location pointed
-    if (0 != ::ioctl(_sock, FIONREAD, &n)) {
+    int result = ::ioctl(_sock, FIONREAD, &n);
+    if (0 != result) {
+        log("ERROR: availableBytesToRead: result is %d errno=%d", result, errno);
         throw SNError("availableBytesToRead");
     }
 

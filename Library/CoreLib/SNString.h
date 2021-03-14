@@ -23,11 +23,19 @@ public:
     std::string str();
     const char * c_str();
     
+    std::vector<SNString> split(const char *delimiter);
     
     void set(const char *newStr);
     void append(const char *newStr);
     void copyTo(std::vector<char> &outBuf);
+    
     bool isEmpty();
+    
+    int toInt();
+    
+    bool startsWith(const char *prefix);
+    
+    void rtrim();
 private:
     std::string _buf;
 };

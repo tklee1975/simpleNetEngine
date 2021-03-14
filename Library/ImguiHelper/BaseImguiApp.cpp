@@ -214,7 +214,7 @@ bool BaseImguiApp::initWindow()
     
     _window = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example",
                                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                               1280, 720, window_flags);    // KEN: Win Size
+                               720, 720, window_flags);    // KEN: Win Size
     
     if (_window == nullptr)
     {

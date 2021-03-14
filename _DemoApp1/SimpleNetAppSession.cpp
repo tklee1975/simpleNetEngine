@@ -38,7 +38,10 @@ void SimpleHostSession::onRecvData(std::vector<char> &buf, size_t &nRead)
     buf[nRead] = '\0';
     const char *msg = (const char *) buf.data();
     std::cout << "RECEIVE: " << msg << "\n";
-
+    if(strlen(msg) == 0) {
+        return;
+    }
+    
     //
     SNString cmd;
     if(msg[0] == 'u'){
@@ -49,6 +52,8 @@ void SimpleHostSession::onRecvData(std::vector<char> &buf, size_t &nRead)
         cmd.set("left");
     } else if(msg[0] == 'r') {
         cmd.set("right");
+    } else {
+        cmd = SNString(msg);
     }
     
     if(cmd.isEmpty() == false) {

@@ -36,8 +36,11 @@ public:
 private:
     ImVec2 _posP1;
     ImVec2 _posP2;
+    
     SimpleNetAppState _state;
     SNHost _host;
+    SNClient _client;    
+    bool _isHost;
     
     SNString _errorMsg;
     bool _isBindPortSuccess;
@@ -56,11 +59,18 @@ private:
     
     // Create room / setup host
     void onCreateRoomClicked();
+    void onJoinHostClicked();
     void setupHost();
+    void setupClient();
 
     //
     void onUpdateWaitClient(double delta);
     void onUpdateConnected(double delta);
+    
+    //
+    void handleMoveCommand(SNString &cmd);
+    void sendCommand(SNString &cmd);
+    void sendMoveCommand(int deltaX, int deltaY);
 };
 
 

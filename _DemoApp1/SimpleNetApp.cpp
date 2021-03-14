@@ -14,6 +14,8 @@ const int kPort = 4567;
 
 SimpleNetApp::SimpleNetApp(){
     _host = SNHost();
+    _client = SNClient();
+    
     _errorMsg = SNString("");
 }
 
@@ -81,6 +83,8 @@ void SimpleNetApp::drawGuiIdle()
     
     if (ImGui::Button("Join Room (Client)")) {
         //std::cout << "'Button A' is clicked\n";
+        _errorMsg.set("");
+        _state = SimpleNetAppStateJoinHost;
     }
 }
 
@@ -89,6 +93,12 @@ void SimpleNetApp::onCreateRoomClicked()
 {
     setupHost();
     _state = SimpleNetAppStateWaitClient;
+    
+}
+
+void SimpleNetApp::onJoinHostClicked()
+{
+    setupClient();
     
 }
 
@@ -113,6 +123,16 @@ void SimpleNetApp::drawGuiHost()
 void SimpleNetApp::drawGuiClient()
 {
     ImGui::Text("Enter the location to join");
+    
+    if (ImGui::Button("Join Host")) {
+        //std::cout << "'Button A' is clicked\n";
+        onJoinHostClicked();
+    }
+    
+    if(! _errorMsg.isEmpty()) {
+        ImGui::Text("%s", _errorMsg.c_str());
+      
+    }
 }
 
 void SimpleNetApp::drawGuiConnected()
@@ -141,13 +161,27 @@ void SimpleNetApp::drawGui()
 void SimpleNetApp::movePlayer(int pid, ImVec2 change)
 {
     ImVec2 &pos = (pid == 0) ? _posP1 : _posP2;
+    int deltaX = (int) change.x;
+    int deltaY = (int) change.y;
     
-    pos.x += change.x;
-    pos.y += change.y;
+    
+    pos.x += deltaX;
+    pos.y += deltaY;
+    
+    bool shouldSendCommand = (pid == 0 && _isHost == true)  // host send to client
+                        || (pid == 1 && _isHost == false);   // client send to host
+    // log("shouldSendCommand: %d", shouldSendCommand);
+    if(shouldSendCommand) {
+        sendMoveCommand(deltaX, deltaY);
+    }
 }
 
 void SimpleNetApp::handleInput(double deltaTime)
 {
+    if(SimpleNetAppStateConnected != _state) {
+        return;
+    }
+    
     ImVec2 dir {0,0};
     float speed = 200;
 
@@ -156,12 +190,17 @@ void SimpleNetApp::handleInput(double deltaTime)
     if (getInputKey(SDLK_a)) dir.x -= 1;
     if (getInputKey(SDLK_d)) dir.x += 1;
 
+    if(dir.x == 0 && dir.y == 0) {
+        return;
+    }
+    
     ImVec2 change;
     
     change.x = dir.x * deltaTime * speed;
     change.y = dir.y * deltaTime * speed;
     
-    movePlayer(0, change);
+    int pid = _isHost ? 0 : 1;
+    movePlayer(pid, change);
 }
 
 void SimpleNetApp::setupHost()
@@ -176,31 +215,43 @@ void SimpleNetApp::setupHost()
         return;
     }
     
+    _isHost = true;
     _isBindPortSuccess = true;
+}
+
+void SimpleNetApp::setupClient()
+{
+    _client.setSessionFactory(new SimpleSessionFactory(this, false));
     
-//    bool isSuccess = host.bindPort(5433);
-//    if(isSuccess == false) {
-//        std::cout << "Fail to bind the port\n";
-//        return;
-//    }
-//
+    SNSocketAddr addr;
+    addr.setIPv4(127, 0, 0, 1);
+    addr.setPort(kPort);
+    
+    
+    bool isSuccess = _client.connectServer(addr);
+    if(isSuccess == false) {
+        _errorMsg.set("Fail to connect the server");
+        std::cout << "Fail to connect the server. err: " << errno << "\n";
+        return;
+    }
+
+    _state = SimpleNetAppStateConnected;
 //    int counter = 0;
 //    std::cout << "Starting the Network Loop\n";
 //    for(;;) {
-//        host.checkNetwork();
+//        client.checkNetwork();
 //        counter++;
 //
-//        if((counter % 1000000) == 0) {
-//            SNSession *session = host.getSession();
+//        if((counter % 500000) == 0) {
+//            SNSession *session = client.getSession();
 //            if(session != NULL) {
-//                session->sendString("100 tick passed\n");
+//                session->sendString("Client: tick passed\n");
 //            }
 //            //host.getSession()->sendString("100 tick passed");
 //            //sendString("100 tick passed");
 //        }
 //        //sleep(1);
 //    }
-//
 }
 
 void SimpleNetApp::onConnected()
@@ -219,11 +270,30 @@ void SimpleNetApp::onReceiveCommand(SNString &cmd)
         movePlayer(1, ImVec2(-30, 0));
     } else if(cmd.str() == "right") {
         movePlayer(1, ImVec2(30, 0));
+    } else if(cmd.startsWith("move")){
+        handleMoveCommand(cmd);
     }
+}
+
+void SimpleNetApp::handleMoveCommand(SNString &cmd)
+{
+    cmd.rtrim();
+    
+    std::vector<SNString> tokens = cmd.split(" ");
+    if(tokens.size() < 3) {
+        log("handleMoveCommand: incorrect token count");
+        return;
+    }
+    int moveX = tokens[1].toInt();
+    int moveY = tokens[2].toInt();
+    
+    int pid = _isHost ? 1 : 0;  //
+    movePlayer(pid, ImVec2(moveX, moveY));
 }
 
 void SimpleNetApp::onUpdateWaitClient(double delta)
 {
+    
     if(_isBindPortSuccess == false) {
         return;
     }
@@ -233,5 +303,43 @@ void SimpleNetApp::onUpdateWaitClient(double delta)
 
 void SimpleNetApp::onUpdateConnected(double delta)
 {
-    _host.checkNetwork();
+    if(_isHost) {
+        _host.checkNetwork();
+    } else {
+        _client.checkNetwork();
+    }
+}
+
+void SimpleNetApp::sendMoveCommand(int deltaX, int deltaY)
+{
+    SNString cmd = SNString("move");
+    char value[100];
+    sprintf(value, " %d", deltaX);
+    cmd.append(value);
+    
+    sprintf(value, " %d", deltaY);
+    cmd.append(value);
+    cmd.append("\n");
+    
+    std::cout << "Command: " << cmd.str() << "\n";
+    
+    sendCommand(cmd);
+}
+
+void SimpleNetApp::sendCommand(SNString &cmd)
+{
+    if(_isHost) {
+        if(_host.getSession() == NULL) {
+            log("SimpleNetApp.sendCommand: host.session not ready");
+            return;
+        }
+        
+        _host.getSession()->sendString(cmd);
+    } else {
+        if(_client.getSession() == NULL) {
+            log("SimpleNetApp.sendCommand: client.session not ready");
+            return;
+        }
+        _client.getSession()->sendString(cmd);
+    }
 }

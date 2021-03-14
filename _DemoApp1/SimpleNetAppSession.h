@@ -20,12 +20,14 @@ class SimpleNetApp;
 class SimpleHostSession : public SNSession {
 public:
     SimpleNetApp *app;
+    bool isHost;
     
     SimpleHostSession(SNSocket *);
     virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
     virtual void onConnect();
     virtual void onDisconnect();
 };
+
 
 class SimpleSessionFactory : public SNSessionFactory {
 public:
@@ -39,6 +41,7 @@ public:
         
         //session->isHost = _isHost;
         session->app = _app;
+        session->isHost = _isHost;
         
         return session;
 //        if(_isHost) {

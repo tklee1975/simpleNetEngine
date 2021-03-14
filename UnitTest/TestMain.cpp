@@ -15,6 +15,72 @@
 using namespace simpleNet;
 using namespace std;
 
+//startsWith(const char *prefix);
+void testStartsWith() {
+    log("testStartsWith");
+    
+    std::vector<SNString> testList;
+    testList.push_back(SNString("12"));
+    testList.push_back(SNString("hello"));
+    testList.push_back(SNString("-12"));
+    
+    SNString testStr = SNString("hello ABCDEF");
+    
+    for(int i=0; i<testList.size(); i++) {
+        const char *prefix = testList[i].c_str();
+        bool isOkay = testStr.startsWith(prefix);
+        
+        cout << "prefix=[" << prefix << "] okay=" << isOkay << "\n";
+    }
+    
+    //std::string =
+}
+
+
+void testStringToInt() {
+    log("testStringToInt");
+    
+    std::vector<SNString> testList;
+    testList.push_back(SNString("12"));
+    testList.push_back(SNString("aaa"));
+    testList.push_back(SNString("-12"));
+    
+    for(int i=0; i<testList.size(); i++) {
+        int result = testList[i].toInt();
+        
+        cout << "str=[" << testList[i].str() << "] int=" << result << "\n";
+    }
+    
+    //std::string = 
+}
+
+void testTrimStr() {
+    log("testTrimStr");
+
+    SNString input = SNString("testing\n");
+    
+    cout << "Before Trim: [" << input.str() << "]\n";
+    
+    input.rtrim();
+    
+    cout << "After Trim: [" << input.str() << "]\n";
+}
+
+void testSplitStr() {
+    log("TestSplitStr");
+    
+    const char *testStr = "mov 12 13";
+    SNString str = SNString(testStr);
+    
+    std::vector<SNString> tokens = str.split(" ");
+    
+    for(int i=0; i<tokens.size(); i++) {
+        SNString str = tokens[i];
+        
+        cout << i << ": " << str.str() << "\n";
+    }
+}
+
 void testSampleClientSession()
 {
     
@@ -532,7 +598,11 @@ void runSingleTest() {
     
     // testCin();
     // testIMGUI();             // ken: not ready
-    testSampleClientSession();
+    testStartsWith();
+    // testStringToInt();
+    // testTrimStr();
+    // testSplitStr();
+    // testSampleClientSession();
     // testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();

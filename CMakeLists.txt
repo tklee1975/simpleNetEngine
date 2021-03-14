@@ -73,7 +73,13 @@ target_link_libraries(test_main PRIVATE ${IMGUI_HELPER_NAME})
 
 # For Testing 
 add_executable(test_gui
-                    ${UNIT_TEST_PATH}/TestGuiMain.cpp
+                ${UNIT_TEST_PATH}/TestGuiMain.cpp
+                ${UNIT_TEST_PATH}/TestGuiApp.h
+                ${UNIT_TEST_PATH}/TestGuiApp.cpp
+                ${DEMO1_PATH}/SimpleNetAppSession.h                
+                ${DEMO1_PATH}/SimpleNetAppSession.cpp
+                ${DEMO1_PATH}/SimpleNetApp.h
+                ${DEMO1_PATH}/SimpleNetApp.cpp
             )
 target_link_libraries(test_gui PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(test_gui PRIVATE ${NET_ENGINE_NAME})

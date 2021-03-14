@@ -20,6 +20,21 @@ namespace simpleNet {
     std::string SNString::str() {
         return _buf;
     }
+
+    const char * SNString::c_str()
+    {
+        return _buf.c_str();
+    }
+
+    bool SNString::isEmpty()
+    {
+        return _buf.empty();
+    }
+
+    void SNString::set(const char *newStr){
+        _buf.clear();
+        _buf.append(newStr);
+    }
     
     void SNString::append(const char *newStr)
     {

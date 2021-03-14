@@ -18,6 +18,9 @@ set(CORE_LIB_PATH       "Library/CoreLib")
 set(NET_ENGINE_NAME     "NetEngine")
 set(NET_ENGINE_PATH     "Library/NetEngine")
 
+set(IMGUI_HELPER_NAME   "ImguiHelper")
+set(IMGUI_HELPER_PATH   "Library/ImguiHelper")
+
 set(UNIT_TEST_PATH      "UnitTest")
 
 #find_package(fmt CONFIG REQUIRED)
@@ -26,11 +29,13 @@ set(UNIT_TEST_PATH      "UnitTest")
 find_package(fmt CONFIG REQUIRED)
 find_package(EASTL CONFIG REQUIRED)
 find_package(EABase CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
 ## Define the library and main source 
 add_subdirectory(${CORE_LIB_PATH})
 add_subdirectory(${NET_ENGINE_PATH})
+add_subdirectory(${IMGUI_HELPER_PATH})
 
 ## Define 
 add_executable(app1
@@ -50,6 +55,7 @@ target_link_libraries(app1 PRIVATE fmt::fmt)
 target_link_libraries(app1 PRIVATE EASTL)
 target_link_libraries(app1 PRIVATE EABase)
 target_link_libraries(app1 PRIVATE imgui::imgui)
+target_link_libraries(app1 PRIVATE ${IMGUI_HELPER_NAME})
 
 # For Testing 
 add_executable(test_main
@@ -63,6 +69,17 @@ target_link_libraries(test_main PRIVATE fmt::fmt)
 target_link_libraries(test_main PRIVATE EASTL)
 target_link_libraries(test_main PRIVATE EABase)
 target_link_libraries(test_main PRIVATE imgui::imgui)
+target_link_libraries(test_main PRIVATE ${IMGUI_HELPER_NAME})
+
+# For Testing 
+add_executable(test_gui
+                    ${UNIT_TEST_PATH}/TestGuiMain.cpp
+            )
+target_link_libraries(test_gui PRIVATE ${CORE_LIB_NAME})
+target_link_libraries(test_gui PRIVATE ${NET_ENGINE_NAME})
+target_link_libraries(test_gui PRIVATE ${IMGUI_HELPER_NAME})
+target_link_libraries(test_gui PRIVATE fmt::fmt)
+target_link_libraries(test_gui PRIVATE imgui::imgui)
 
 # now register the executable with CTest
 #add_test(NAME my_test COMMAND my_test)

@@ -20,7 +20,7 @@ SNSession::SNSession(SNSocket *socket)
 
 SNSession::~SNSession()
 {
-    if(! _socket) {
+    if(_socket != NULL) {
         _socket->close();
     }
 }
@@ -31,9 +31,9 @@ void SNSession::onRecvData(std::vector<char> &buf, size_t &nRead)
     std::cout << "onRecvData: " << nRead << " bytes received\n";
 }
 
-void SNSession::sendData(std::vector<char> &dataBuf)
+size_t SNSession::sendData(std::vector<char> &dataBuf)
 {
-    _socket->send(dataBuf.data(), dataBuf.size());
+    return _socket->send(dataBuf.data(), dataBuf.size());
 }
 
 size_t SNSession::availableBytesToRead()
@@ -59,10 +59,12 @@ void SNSession::receiveData() {
         return;
     }
     
-    _inBuffer.clear();
     _socket->recv(_inBuffer, nRead);
     _inBuffer.push_back(0);   // add the character '\0' to make it a string
 
+    std::string strValue = std::string(_inBuffer.begin(), _inBuffer.end());
+    std::cout << "receiveData: " << strValue << "\n";
+    
     onRecvData(_inBuffer, nRead);
 }
 
@@ -100,11 +102,39 @@ void SNSession::sendString(const char *str)
     sendString(s);
 }
 
+// http://www.kegel.com/dkftpbench/nonblocking.html
+void SNSession::flushBuffer()
+{
+    int sendCount = sendData(_outBuffer);
+    if(sendCount < 0) {
+        log("ERROR: flushBuffer. sendData error");
+        return;
+    }
+    
+    
+    if(sendCount > 0) {
+        std::string strValue = std::string(_outBuffer.begin(), _outBuffer.end());
+        std::cout << "flushBuffer: " << strValue << " count:"<< sendCount << "\n";
+    }
+    
+    _outBuffer.erase(_outBuffer.begin(), _outBuffer.begin() + sendCount);
+    //_outBuffer.clear();
+}
+
+void SNSession::putBufferWithStr(SNString &str)
+{
+    //_outBuffer.ins
+    str.appendTo(_outBuffer);
+}
+
 void SNSession::sendString(SNString &str)
 {
-    _outBuffer.clear();
-    str.copyTo(_outBuffer);
+    // ken: TODO: Add a queue to prevent buffer ov
+
     
+    str.copyTo(_outBuffer);     // the outBuffer is clear here...!!!
+    
+    // Reference here!!!
     sendData(_outBuffer);
 }
 

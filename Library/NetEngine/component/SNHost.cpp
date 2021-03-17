@@ -9,21 +9,17 @@
 #include "SNSessionFactory.h"
 #include "SNSocket.h"
 #include <iostream>
+#include <CoreLib.h>
 
 
 namespace simpleNet {
 
 
-SNHost::SNHost()
+SNHost::SNHost() : SNNetBase()
 {
     _state = SNHostStateIdle;
 }
     
-void SNHost::setSessionFactory(SNSessionFactory *factory)
-{
-    _factory = factory;
-}
-
 bool SNHost::bindPort(int port)
 {
     _port = port;
@@ -70,23 +66,13 @@ void SNHost::initServerSocket()
 
 void SNHost::initClientSocket()
 {
-    // release current 
-    if(_clientSocket) {
-        delete _clientSocket;
-        _clientSocket = NULL;
-    }
-    
-    
-    // ken: FIXME: Clear the previous connection
-    _clientSocket = new SNSocket();
-    //_serverSocket->createTCP();
-    //_clientSocket->setNonBlock(true);
+    initSocket();
 }
-
-SNSession *SNHost::getSession()
-{
-    return _session;
-}
+//
+//SNSession *SNHost::getSession()
+//{
+//    return _session;
+//}
 
 bool SNHost::attemptAccept()
 {
@@ -97,7 +83,7 @@ bool SNHost::attemptAccept()
     initClientSocket();
     //SNSocket sock = *_clientSocket;     // ken: HACK: is it okay?
     
-    SNSocketAcceptStatus status = _serverSocket->attempAccept(*_clientSocket);
+    SNSocketAcceptStatus status = _serverSocket->attempAccept(*_mainSocket);
     if(status == SNSocketAcceptFail) {
         throw SNError("attemptAccept fail");
     }
@@ -107,8 +93,8 @@ bool SNHost::attemptAccept()
     }
     
     // Create the Socket
-    _clientSocket->setNonBlock(true);
-    _session = _factory->create(_clientSocket);
+    _mainSocket->setNonBlock(true);
+    _session = _factory->create(_mainSocket);
     _session->setConnected(/* isHost */ true);
     
     return true;
@@ -140,19 +126,39 @@ void SNHost::checkNetworkWhenConnect()
 {
     checkIncomingData();
 }
-
-bool SNHost::checkIncomingData()
-{
-    // log("Checking Incoming data");
-    size_t nRead = 0;
-    if(_session->isConncting(nRead) == false) {  // check for data
-        return false;
-    }
-    
-    // log("Checking receive data");
-    _session->receiveData();
-    
-    return true;
-}
+//
+//void SNHost::queueToOutBuffer(SNString &str)
+//{
+//    if(str.str().size() == 0) {
+//        return;
+//    }
+//
+//    if(_session != NULL) {
+//        _session->putBufferWithStr(str);
+//    }
+//}
+//
+//void SNHost::sendDataOut()
+//{
+//    if(_session == NULL) {
+//        return;
+//    }
+//
+//    _session->flushBuffer();
+//}
+//
+//bool SNHost::checkIncomingData()
+//{
+//    // log("Checking Incoming data");
+//    size_t nRead = 0;
+//    if(_session->isConncting(nRead) == false) {  // check for data
+//        return false;
+//    }
+//
+//    // log("Checking receive data");
+//    _session->receiveData();
+//
+//    return true;
+//}
     
 } // End of Namespace

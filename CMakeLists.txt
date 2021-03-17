@@ -60,6 +60,10 @@ target_link_libraries(app1 PRIVATE ${IMGUI_HELPER_NAME})
 # For Testing 
 add_executable(test_main
                     ${UNIT_TEST_PATH}/TestMain.cpp
+                    ${DEMO1_PATH}/SimpleNetAppSession.h                
+                    ${DEMO1_PATH}/SimpleNetAppSession.cpp
+                    ${DEMO1_PATH}/SimpleNetApp.h
+                    ${DEMO1_PATH}/SimpleNetApp.cpp  
                     ${UNIT_TEST_PATH}/TestNetSession.cpp
                     ${UNIT_TEST_PATH}/TestNetSession.h
             )

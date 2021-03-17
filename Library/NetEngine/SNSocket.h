@@ -72,12 +72,12 @@ public:
     bool bind(const SNSocketAddr& addr);
     void connect(const SNSocketAddr& addr);
     bool listen(int backLog);
-    void send(const SNSocketAddr& addr, const char* data, size_t dataSize);
+    //int send(const SNSocketAddr& addr, const char* data, size_t dataSize);    // no use??
     void recv(std::vector<char> & buf, size_t bytesToRecv);
     bool accept(SNSocket &acceptedSocket);
     SNSocketAcceptStatus attempAccept(SNSocket &acceptedSocket);
     
-    void send(const char* data, size_t dataSize);
+    int send(const char* data, size_t dataSize);
     size_t availableBytesToRead();
     int getSockFd();
     void setNonBlock(bool flag);

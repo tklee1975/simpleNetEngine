@@ -26,6 +26,11 @@ public:
     virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
     virtual void onConnect();
     virtual void onDisconnect();
+    
+    std::vector<SNString> extractCommands(std::vector<char> &buf);
+    //std::vector<SNString> extractCommands(std::vector<char> &buf);
+private:
+    std::vector<char> _remainCommandBuf;    // ken: store the incomplete command 
 };
 
 

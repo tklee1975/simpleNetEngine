@@ -28,6 +28,7 @@ public:
     void set(const char *newStr);
     void append(const char *newStr);
     void copyTo(std::vector<char> &outBuf);
+    void appendTo(std::vector<char> &outBuf);
     
     bool isEmpty();
     

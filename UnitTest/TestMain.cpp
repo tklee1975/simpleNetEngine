@@ -10,12 +10,68 @@
 #include <session/SNEchoSession.h>
 #include "TestNetSession.h"
 #include <fcntl.h> /* Added for the nonblocking socket */
-
+#include "../_DemoApp1/SimpleNetAppSession.h"
 
 using namespace simpleNet;
 using namespace std;
 
 //startsWith(const char *prefix);
+void testExtractCommands() {
+    
+    const char *testInput[3] = {
+        "cmd1\n",
+        "cmd2\ncmd3\ncmd",
+        "4\ncmd5\n",
+    };
+    
+    SimpleHostSession session = SimpleHostSession(nullptr);
+    
+    for(int i=0; i<3; i++) {
+        int len = strlen(testInput[i]);
+        std::vector<char> buffer(testInput[i], testInput[i]+len);
+        
+        string bufferStr = string(buffer.begin(), buffer.end());
+        cout << "buffer: [" << bufferStr << "]\n";
+        
+        buffer[len] = '\0';
+        std::vector<SNString> result = session.extractCommands(buffer);
+        
+        for(int i=0; i<result.size(); i++) {
+            cout << "RESULT-" << i << ": " << result[i].str() << "\n";
+        }
+    }
+//
+//    strcpy(data, "abcd\n");
+//    cout << data << "\n";
+//
+//    std::vector<char> buffer1(data, data+strlen(data));
+//    strValue = string(buffer1.begin(), buffer1.end());
+//    cout << "buffer1: " << strValue << "\n";
+//
+//
+//    strcpy(data, "efg\n");
+//    cout << data << "\n";
+}
+
+void testStringAppend() {
+    SNString str = SNString("testing-");
+    std::vector<char> buffer;
+    
+    str.appendTo(buffer);
+    string strValue;
+    
+    strValue = string(buffer.begin(), buffer.end());
+    cout << "buffer: " << strValue << "\n";
+    
+    str.appendTo(buffer);
+    strValue = string(buffer.begin(), buffer.end());
+    cout << "buffer: " << strValue << "\n";
+    
+    str.appendTo(buffer);
+    strValue = string(buffer.begin(), buffer.end());
+    cout << "buffer: " << strValue << "\n";
+}
+
 void testStartsWith() {
     log("testStartsWith");
     
@@ -103,16 +159,19 @@ void testSampleClientSession()
     int counter = 0;
     std::cout << "Starting the Network Loop\n";
     for(;;) {
+        client.sendDataOut();
         client.checkNetwork();
         counter++;
 
         if((counter % 500000) == 0) {
-            SNSession *session = client.getSession();
-            if(session != NULL) {
-                session->sendString("Client: tick passed\n");
-            }
+//            SNSession *session = client.getSession();
+//            if(session != NULL) {
+//                session->sendString("Client: tick passed\n");
+//            }
             //host.getSession()->sendString("100 tick passed");
             //sendString("100 tick passed");
+            SNString str = SNString("testing");
+            client.queueToOutBuffer(str);
         }
         //sleep(1);
     }
@@ -139,17 +198,23 @@ void testSampleHostSession()
     int counter = 0;
     std::cout << "Starting the Network Loop\n";
     for(;;) {
+        host.sendDataOut();
         host.checkNetwork();
         counter++;
         
         if((counter % 1000000) == 0) {
-            SNSession *session = host.getSession();
-            if(session != NULL) {
-                session->sendString("100 tick passed\n");
-            }
+            SNString test = SNString("100 tick passed\n");
+            host.queueToOutBuffer(test);
+//            SNSession *session = host.getSession();
+//            if(session != NULL) {
+//                session->sendString("100 tick passed\n");
+//            }
+            //host.
+            
             //host.getSession()->sendString("100 tick passed");
             //sendString("100 tick passed");
         }
+        
         //sleep(1);
     }
     
@@ -598,12 +663,14 @@ void runSingleTest() {
     
     // testCin();
     // testIMGUI();             // ken: not ready
-    testStartsWith();
+    /// testStringAppend();
+    // testStartsWith();
     // testStringToInt();
     // testTrimStr();
     // testSplitStr();
-    // testSampleClientSession();
-    // testSampleHostSession();
+    testExtractCommands();
+    //testSampleClientSession();
+   // testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();

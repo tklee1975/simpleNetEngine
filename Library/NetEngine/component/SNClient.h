@@ -9,6 +9,7 @@
 #define SNClient_h
 
 #include <stdio.h>
+#include "SNNetBase.h"
 
 namespace simpleNet {
 
@@ -25,25 +26,24 @@ class SNSocketAddr;
 
 
 
-class SNClient {
+class SNClient : public SNNetBase {
 public:
     SNClient();
-    void setSessionFactory(SNSessionFactory *factory);
+    //void setSessionFactory(SNSessionFactory *factory);
     bool connectServer(const SNSocketAddr &addr);
     void checkNetwork();           // ken: is it a good method name?
-    SNSession *getSession();        // ken: ???: should use const SNSession?
     
-private:
-    SNSessionFactory* _factory = NULL;
-    SNSession *_session = NULL;         // connected session
-    SNSocket *_clientSocket = NULL;           // connected socket
+//private:
+//    SNSessionFactory* _factory = NULL;
+//    SNSession *_session = NULL;         // connected session
+//    SNSocket *_clientSocket = NULL;           // connected socket
     SNClientState _state;
     
 private:
-    void initClientSocket();
+//    void initClientSocket();
     void checkNetworkWhenConnect();
-    
-    bool checkIncomingData();         // false if connection broken
+//    
+//    bool checkIncomingData();         // false if connection broken
 
     
 };

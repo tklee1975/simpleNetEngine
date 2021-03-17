@@ -91,5 +91,12 @@ namespace simpleNet {
 
     }
     
+    void SNString::appendTo(std::vector<char> &outBuf)
+    {
+    // Reference:
+    //  https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar
+        std::copy(_buf.begin(), _buf.end(), std::back_inserter(outBuf));
+    }
 }
+
 

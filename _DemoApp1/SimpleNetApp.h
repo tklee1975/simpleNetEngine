@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <CoreLib.h>
 #include <NetEngine.h>
-
 #include <ImguiHelper.h>
 
 using namespace simpleNet;
@@ -41,11 +40,15 @@ private:
     SNHost _host;
     SNClient _client;    
     bool _isHost;
+    SNSocketAddr _sockAddr;
     
     SNString _errorMsg;
     bool _isBindPortSuccess;
     
-    void drawShapes();
+    int _cmdCounter;
+    
+    // --- internal Methods
+    
     
     void handleInput(double delta);
     void movePlayer(int pid, ImVec2 change);
@@ -56,6 +59,8 @@ private:
     void drawGuiHost();
     void drawGuiClient();
     void drawGuiConnected();
+    
+    void drawShapes();
     
     // Create room / setup host
     void onCreateRoomClicked();
@@ -71,6 +76,8 @@ private:
     void handleMoveCommand(SNString &cmd);
     void sendCommand(SNString &cmd);
     void sendMoveCommand(int deltaX, int deltaY);
+    
+    bool setupSockAddress(SNString &str, int port);
 };
 
 

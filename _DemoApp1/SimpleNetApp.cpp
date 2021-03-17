@@ -120,13 +120,45 @@ void SimpleNetApp::drawGuiHost()
     
 }
 
+bool SimpleNetApp::setupSockAddress(SNString &str, int port)
+{
+    std::vector<SNString> tokens = str.split(".");
+    if(tokens.size() != 4) {
+        _errorMsg.set("Invalid IP Address");
+        return false;
+    }
+    _sockAddr.setIPv4(tokens[0].toInt(),
+                      tokens[1].toInt(),
+                      tokens[2].toInt(),
+                      tokens[3].toInt());
+    _sockAddr.setPort(port);
+    
+    _errorMsg.set("");
+    return true;
+}
+
 void SimpleNetApp::drawGuiClient()
 {
+    static char address[128] = "127.0.0.1";
+    static int port = kPort;
+    
     ImGui::Text("Enter the location to join");
     
+    
+//    IMGUI_API bool          InputText(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+    ImGui::InputText("IP", address, 128);    
+    ImGui::InputInt("PORT", &port);
+               
+    
     if (ImGui::Button("Join Host")) {
-        //std::cout << "'Button A' is clicked\n";
-        onJoinHostClicked();
+        std::cout << "'Join Host' is clicked\n";
+        std::cout << "ip: " << address << " port: " << port << "\n";
+        
+        SNString str = SNString(address);
+        if(setupSockAddress(str, port)) {
+            onJoinHostClicked();
+            return;
+        }
     }
     
     if(! _errorMsg.isEmpty()) {
@@ -138,6 +170,8 @@ void SimpleNetApp::drawGuiClient()
 void SimpleNetApp::drawGuiConnected()
 {
     ImGui::Text("Players are connected");
+    ImGui::Text("Player 1 (%f, %f)", _posP1.x, _posP1.y);
+    ImGui::Text("Player 2 (%f, %f)", _posP2.x, _posP2.y);
 }
 
 
@@ -223,40 +257,21 @@ void SimpleNetApp::setupClient()
 {
     _client.setSessionFactory(new SimpleSessionFactory(this, false));
     
-    SNSocketAddr addr;
-    addr.setIPv4(127, 0, 0, 1);
-    addr.setPort(kPort);
     
-    
-    bool isSuccess = _client.connectServer(addr);
-    if(isSuccess == false) {
+    try {
+        _client.connectServer(_sockAddr);
+        
+        _state = SimpleNetAppStateConnected;
+    }catch(...) {
         _errorMsg.set("Fail to connect the server");
         std::cout << "Fail to connect the server. err: " << errno << "\n";
-        return;
     }
-
-    _state = SimpleNetAppStateConnected;
-//    int counter = 0;
-//    std::cout << "Starting the Network Loop\n";
-//    for(;;) {
-//        client.checkNetwork();
-//        counter++;
-//
-//        if((counter % 500000) == 0) {
-//            SNSession *session = client.getSession();
-//            if(session != NULL) {
-//                session->sendString("Client: tick passed\n");
-//            }
-//            //host.getSession()->sendString("100 tick passed");
-//            //sendString("100 tick passed");
-//        }
-//        //sleep(1);
-//    }
 }
 
 void SimpleNetApp::onConnected()
 {
     _state = SimpleNetAppStateConnected;
+    _cmdCounter = 0;
 }
 
 void SimpleNetApp::onReceiveCommand(SNString &cmd)
@@ -278,6 +293,8 @@ void SimpleNetApp::onReceiveCommand(SNString &cmd)
 void SimpleNetApp::handleMoveCommand(SNString &cmd)
 {
     cmd.rtrim();
+    
+    log("RECEIVE: cmd=[%s]", cmd.c_str());
     
     std::vector<SNString> tokens = cmd.split(" ");
     if(tokens.size() < 3) {
@@ -304,8 +321,10 @@ void SimpleNetApp::onUpdateWaitClient(double delta)
 void SimpleNetApp::onUpdateConnected(double delta)
 {
     if(_isHost) {
+        _host.sendDataOut();
         _host.checkNetwork();
     } else {
+        _client.sendDataOut();
         _client.checkNetwork();
     }
 }
@@ -319,9 +338,14 @@ void SimpleNetApp::sendMoveCommand(int deltaX, int deltaY)
     
     sprintf(value, " %d", deltaY);
     cmd.append(value);
+    
+    sprintf(value, " %d", _cmdCounter);
+    cmd.append(value);
     cmd.append("\n");
     
-    std::cout << "Command: " << cmd.str() << "\n";
+    std::cout << "Send Command: " << cmd.str() << "\n";
+    
+    _cmdCounter++;
     
     sendCommand(cmd);
 }
@@ -334,12 +358,14 @@ void SimpleNetApp::sendCommand(SNString &cmd)
             return;
         }
         
-        _host.getSession()->sendString(cmd);
+        //_host.getSession()->sendString(cmd);
+        _host.queueToOutBuffer(cmd);
     } else {
         if(_client.getSession() == NULL) {
             log("SimpleNetApp.sendCommand: client.session not ready");
             return;
         }
-        _client.getSession()->sendString(cmd);
+        _client.queueToOutBuffer(cmd);
+        //_client.getSession()->sendString(cmd);
     }
 }

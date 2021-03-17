@@ -97,7 +97,7 @@ void SNSocket::setNonBlock(bool nonBlock)
  SNSocket
  */
 void SNSocket::close()
-{
+{    
     if (_sock != INVALID_SOCKET)
     {
         #ifdef _WIN32
@@ -119,7 +119,7 @@ void SNSocket::createTCP()
         std::cout << "fail to connect socket\n";
         return;
     }
-    std::cout << "socket okay. sock=" << _sock << "\n";
+    // std::cout << "socket okay. sock=" << _sock << "\n";
 }
 
 bool SNSocket::bind(const SNSocketAddr& addr)
@@ -204,20 +204,20 @@ bool SNSocket::accept(SNSocket &acceptedSocket)
 }
 
 
-void SNSocket::send(const char* data, size_t dataSize)
+int SNSocket::send(const char* data, size_t dataSize)
 {
     if (dataSize > INT_MAX) {
         std::cout << "Send dataSize too big\n";
-        return;
+        return -1;
     }
 
     int ret = ::send(_sock, data, (int)dataSize, 0);
     if (ret < 0) {
         std::cout << "Fail to send " << ret << "\n";
-        return;
+        return -1;
     }
     
-    return;
+    return ret; 
 }
 
 

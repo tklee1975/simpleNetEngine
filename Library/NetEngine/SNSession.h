@@ -27,7 +27,7 @@ public:
     
     
     
-    void sendData(std::vector<char> &dataBuf);
+    size_t sendData(std::vector<char> &dataBuf);
     void sendString(SNString &str);     // ken: is sendString(SNString *str) better??
     void sendString(const char *str);
     
@@ -39,6 +39,8 @@ public:
     bool hasData();
     bool isConncting(size_t &availableByte);
     void receiveData();
+    void putBufferWithStr(SNString &str);
+    void flushBuffer();
     
 protected:  // implemented by the subclass
     virtual void onConnect() = 0;
@@ -47,7 +49,7 @@ protected:  // implemented by the subclass
     
 private:
     std::vector<char> _outBuffer;
-    std::vector<char> _inBuffer;
+    std::vector<char> _inBuffer;            // ken: use to store the incoming buffer
     bool _isAlive;
     
     

@@ -14,15 +14,15 @@
 namespace simpleNet {
 
 
-SNClient::SNClient()
+SNClient::SNClient() : SNNetBase()
 {
     _state = SNClientStateIdle;
 }
-    
-void SNClient::setSessionFactory(SNSessionFactory *factory)
-{
-    _factory = factory;
-}
+//    
+//void SNClient::setSessionFactory(SNSessionFactory *factory)
+//{
+//    _factory = factory;
+//}
 
 bool SNClient::connectServer(const SNSocketAddr &addr)
 {
@@ -33,17 +33,16 @@ bool SNClient::connectServer(const SNSocketAddr &addr)
     
     //
     // Get the socket reference
-    initClientSocket(); //
+    initSocket();
     
     
-    _clientSocket->connect(addr);
-    
-    _clientSocket->setNonBlock(true);
+    _mainSocket->connect(addr);
+    _mainSocket->setNonBlock(true);
     // Create the TCP
     
     
     
-    _session = _factory->create(_clientSocket);
+    _session = _factory->create(_mainSocket);
     _session->setConnected(/* isHost */ false);
     
     _state = SNClientStatetConnected;
@@ -51,26 +50,21 @@ bool SNClient::connectServer(const SNSocketAddr &addr)
     return true;
 }
 
-SNSession *SNClient::getSession()
-{
-    return _session;
-}
-
-
-void SNClient::initClientSocket()
-{
-    // release current
-    if(_clientSocket) {
-        delete _clientSocket;
-        _clientSocket = NULL;
-    }
-    
-    
-    // ken: FIXME: Clear the previous connection
-    _clientSocket = new SNSocket();
-    _clientSocket->createTCP();
-    //_clientSocket->setNonBlock(true);
-}
+//
+//void SNClient::initClientSocket()
+//{
+//    // release current
+//    if(_clientSocket) {
+//        delete _clientSocket;
+//        _clientSocket = NULL;
+//    }
+//
+//
+//    // ken: FIXME: Clear the previous connection
+//    _clientSocket = new SNSocket();
+//    _clientSocket->createTCP();
+//    //_clientSocket->setNonBlock(true);
+//}
 
 //SNHostStatetIdle,
 //SNHostStatetWaitForClient,            // after bindPort and before accept
@@ -88,23 +82,5 @@ void SNClient::checkNetworkWhenConnect()
     checkIncomingData();
 }
 
-bool SNClient::checkIncomingData()
-{
-    if(_session == NULL) {
-        log("checkIncomingData: session is NULL");
-        return false;
-    }
-    
-    // log("Checking Incoming data");
-    size_t nRead = 0;
-    if(_session->isConncting(nRead) == false) {  // check for data
-        return false;
-    }
-    
-    // log("Checking receive data");
-    _session->receiveData();
-    
-    return true;
-}
     
 } // End of Namespace

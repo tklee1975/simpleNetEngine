@@ -59,6 +59,8 @@ public:
     const SOCKET INVALID_SOCKET = -1;
 #endif
 
+    SNSocket();
+    
     // Constructor & Destructor
     ~SNSocket() {
         close();
@@ -80,10 +82,16 @@ public:
     int send(const char* data, size_t dataSize);
     size_t availableBytesToRead();
     int getSockFd();
-    void setNonBlock(bool flag);
+    
+    // Options
+    void setNonBlock(bool isNonBlack);
+    void setReuseAddress(bool enableReuse);
     
 private:
     SOCKET _sock = INVALID_SOCKET;
+    bool _enableReuseAddress;   // reuse address and port!
+    
+    void enableReuseAddress(const SNSocketAddr& addr);
 };
 
 

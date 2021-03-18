@@ -78,7 +78,7 @@ void SimpleNetApp::drawGuiIdle()
 {
     if (ImGui::Button("Create Room (Host)")) {
         //std::cout << "'Button A' is clicked\n";
-        onCreateRoomClicked();
+        onStartRoomClicked();
     }
     
     if (ImGui::Button("Join Room (Client)")) {
@@ -92,8 +92,21 @@ void SimpleNetApp::drawGuiIdle()
 void SimpleNetApp::onCreateRoomClicked()
 {
     setupHost();
-    _state = SimpleNetAppStateWaitClient;
     
+    if(_isBindPortSuccess == false){
+        return;
+    }
+    
+    _state = SimpleNetAppStateWaitClient;
+    //setupHost();
+    //_state = SimpleNetAppStateCreateHost; // SimpleNetAppStateWaitClient;
+}
+
+void SimpleNetApp::onStartRoomClicked()
+{
+    //setupHost();
+    _state = SimpleNetAppStateCreateHost;
+    //_state = SimpleNetAppStateWaitClient;
 }
 
 void SimpleNetApp::onJoinHostClicked()
@@ -105,18 +118,8 @@ void SimpleNetApp::onJoinHostClicked()
 void SimpleNetApp::drawGuiHost()
 {
     ImGui::Text("Waiting client to join");
-    ImGui::Text("Host location: locahost:%d", kPort);
-    ImGui::NewLine();
-    if(! _errorMsg.isEmpty()) {
-        ImGui::Text("%s", _errorMsg.c_str());
-        
-        ImGui::NewLine();
-        
-        if (ImGui::Button("Recreate Host")) {
-            //std::cout << "'Button A' is clicked\n";
-            onCreateRoomClicked();
-        }
-    }
+    ImGui::Text("Host location: locahost:%d", _port);
+    
     
 }
 
@@ -135,6 +138,36 @@ bool SimpleNetApp::setupSockAddress(SNString &str, int port)
     
     _errorMsg.set("");
     return true;
+}
+
+
+void SimpleNetApp::drawGuiCreateHost()
+{
+    static char address[128] = "127.0.0.1";
+    static int port = kPort;
+    
+    ImGui::Text("Define the port and Click Start Host");
+    
+   
+    ImGui::InputInt("PORT", &port);
+              
+    if(_errorMsg.str() != "") {
+        ImGui::Text("%s", _errorMsg.c_str());
+    }
+    
+    if (ImGui::Button("Create Room")) {
+        std::cout << "'Join Host' is clicked\n";
+        std::cout << "ip: " << address << " port: " << port << "\n";
+        _port = port;
+        
+        onCreateRoomClicked();
+//        SNString str = SNString(address);
+//        if(setupSockAddress(str, port)) {
+//            onJoinHostClicked();
+//            return;
+//        }
+    }
+    
 }
 
 void SimpleNetApp::drawGuiClient()
@@ -170,6 +203,7 @@ void SimpleNetApp::drawGuiClient()
 void SimpleNetApp::drawGuiConnected()
 {
     ImGui::Text("Players are connected");
+    ImGui::Text(_isHost ? "You are the host" : "You are the guest");
     ImGui::Text("Player 1 (%f, %f)", _posP1.x, _posP1.y);
     ImGui::Text("Player 2 (%f, %f)", _posP2.x, _posP2.y);
 }
@@ -177,7 +211,8 @@ void SimpleNetApp::drawGuiConnected()
 
 void SimpleNetApp::drawGui()
 {
-    ImGui::Begin("Control Panel");
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::Begin("Main Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
     
     if(SimpleNetAppStateIdle == _state) {
         drawGuiIdle();
@@ -187,6 +222,8 @@ void SimpleNetApp::drawGui()
         drawGuiClient();
     } else if(SimpleNetAppStateConnected == _state) {
         drawGuiConnected();
+    } else if(SimpleNetAppStateCreateHost == _state) {
+        drawGuiCreateHost();
     }
     
     ImGui::End();
@@ -241,7 +278,7 @@ void SimpleNetApp::setupHost()
 {
     auto factory = new SimpleSessionFactory(this, true);
     _host.setSessionFactory(factory);
-    bool isSuccess = _host.bindPort(kPort);
+    bool isSuccess = _host.bindPort(_port);
     
     if(isSuccess == false) {
         _errorMsg.set("Fail to bind the port");
@@ -257,6 +294,7 @@ void SimpleNetApp::setupClient()
 {
     _client.setSessionFactory(new SimpleSessionFactory(this, false));
     
+    _isHost = false;
     
     try {
         _client.connectServer(_sockAddr);

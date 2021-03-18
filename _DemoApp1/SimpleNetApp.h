@@ -17,9 +17,10 @@ using namespace simpleNet;
 
 enum SimpleNetAppState {
     SimpleNetAppStateIdle = 0,
-    SimpleNetAppStateWaitClient = 1,
-    SimpleNetAppStateJoinHost = 2,
-    SimpleNetAppStateConnected = 3,
+    SimpleNetAppStateCreateHost = 1,
+    SimpleNetAppStateWaitClient = 2,
+    SimpleNetAppStateJoinHost = 3,
+    SimpleNetAppStateConnected = 4,
 };
 
 class SimpleNetApp : public BaseImguiApp {
@@ -40,6 +41,7 @@ private:
     SNHost _host;
     SNClient _client;    
     bool _isHost;
+    int _port;
     SNSocketAddr _sockAddr;
     
     SNString _errorMsg;
@@ -59,11 +61,14 @@ private:
     void drawGuiHost();
     void drawGuiClient();
     void drawGuiConnected();
+    void drawGuiCreateHost();
     
     void drawShapes();
     
     // Create room / setup host
     void onCreateRoomClicked();
+    void onStartRoomClicked();
+    
     void onJoinHostClicked();
     void setupHost();
     void setupClient();

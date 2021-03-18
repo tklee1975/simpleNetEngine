@@ -23,6 +23,7 @@ namespace simpleNet {
 SNSocketAddr::SNSocketAddr()
 {
 	memset(&_addr, 0, sizeof(_addr));
+    
 }
 
 void SNSocketAddr::setPort(uint16_t port)
@@ -48,6 +49,8 @@ void SNSocketAddr::setIPv4(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 /**
  Socket
  */
+
+
 class SNSocketInit {
 public:
 #ifdef _WIN32
@@ -73,9 +76,19 @@ public:
 #endif
 };
 
+SNSocket::SNSocket()
+{
+    _enableReuseAddress = false;
+}
+
 int SNSocket::getSockFd()
 {
     return _sock;
+}
+
+void SNSocket::setReuseAddress(bool enableReuse)
+{
+    _enableReuseAddress = enableReuse;
 }
 
 void SNSocket::setNonBlock(bool nonBlock)
@@ -122,8 +135,24 @@ void SNSocket::createTCP()
     // std::cout << "socket okay. sock=" << _sock << "\n";
 }
 
+void SNSocket::enableReuseAddress(const SNSocketAddr& addr)
+{
+    if(_sock <= INVALID_SOCKET) {
+        std::cout << "enableReuseAddress: socket not ready\n";
+        return;
+    }
+    setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR,
+               reinterpret_cast<const char*>(&addr._addr),
+               static_cast<int>(sizeof(addr._addr)));
+    std::cout << "DEBUG: enableReuseAddress: option is set\n";
+}
+
 bool SNSocket::bind(const SNSocketAddr& addr)
 {
+    if(_enableReuseAddress) {
+        enableReuseAddress(addr);
+    }
+    
     int ret = ::bind(_sock, &addr._addr, sizeof(addr._addr));
     if (ret != 0) {
         //throw MyError("bind");

@@ -10,7 +10,7 @@
 
 SimpleHostSession::SimpleHostSession(SNSocket *sock) : SNSession(sock)
 {
-
+    
 }
 
 void SimpleHostSession::onConnect()
@@ -89,17 +89,19 @@ std::vector<SNString> SimpleHostSession::extractCommands(std::vector<char> &buf)
         if(it == buf.end()) {   // Nothing find
             
             std::vector<char> part = std::vector<char>(start, it);
-            debugStr = std::string(part.begin(), part.end());
+            //debugStr = std::string(part.begin(), part.end());
             // std::cout << "debugStr: [" << debugStr << "]\n";
             
             _remainCommandBuf.clear();
             _remainCommandBuf.insert(_remainCommandBuf.end(), part.begin(), part.end());
+            _remainCommandBuf.push_back('\0'); // ken: prevent adding unknow characters
             //_remainCommandBuf.
             
             break;
         }
         
         std::vector<char> part = std::vector<char>(start, it);
+        part.push_back('\0');   // ken: prevent adding unknow characters
         //debugStr = std::string(part.begin(), part.end());
         //std::cout << "debugStr: [" << debugStr << "]\n";
         
@@ -113,8 +115,8 @@ std::vector<SNString> SimpleHostSession::extractCommands(std::vector<char> &buf)
         command.append(part.data());
         command.append("\0");
         
-        
-        std::cout << "command: [" << command.c_str() << "]\n";
+        std::cout << "part.data: [" << part.data() << "] size=" << (part.size()) << "\n";
+        std::cout << "command: [" << command.c_str() << "] \n";
         result.push_back(command);
         
         // Increase the iterator

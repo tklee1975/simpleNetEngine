@@ -34,6 +34,7 @@ bool SNHost::bindPort(int port)
     initServerSocket(); //
     
     _serverSocket->setNonBlock(true);
+    _serverSocket->setReuseAddress(true);
     // Create the TCP
     
     // Bind the port

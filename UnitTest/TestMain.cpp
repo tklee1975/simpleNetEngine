@@ -425,6 +425,54 @@ void testNonBlockingServer() {
     serverSocket.close();
 }
 
+// ken:
+//      to test rebind socket, do the follow
+//          1. bind the server once
+//          2. telnet to it and don't close
+//          3. stop the server
+//          4. start the server again (need to rebind or else will fail)
+//  
+void testRebindSocket() {
+    SNSocketAddr addr;
+    addr.setIPv4(0,0,0,0);
+    addr.setPort(3456);
+
+    SNSocket serverSocket;
+    serverSocket.setReuseAddress(true);
+    serverSocket.createTCP();
+    if(serverSocket.bind(addr) == false) {
+        std::cout << "Fail to bind\n";
+        return;
+    }
+    if(serverSocket.listen(10) == false) {
+        std::cout << "Fail to listen\n";
+        return;
+    }
+    
+    SNSocket clientSocket;
+    auto factory = SNEchoSessionFactory();
+    
+    bool isAccepted = serverSocket.accept(clientSocket);
+    if(isAccepted == false) {
+        std::cout << "Client fail to accept\n";
+        return;
+    }
+    std::cout << "Client success to accept\n";
+    
+    SNSession *session = factory.create(&clientSocket);
+        
+    std::vector<char> buf;
+    std::vector<char> outBuf;
+    for(;;) {
+        if(session->isAlive() == false) {
+            break;
+        }
+        session->receiveData();  // ken: sleep inside if no data received
+    }
+    
+    
+    serverSocket.close();
+}
 
 void testEchoServer() {
     SNSocketAddr addr;
@@ -668,13 +716,14 @@ void runSingleTest() {
     // testStringToInt();
     // testTrimStr();
     // testSplitStr();
-    testExtractCommands();
+    //testExtractCommands();
     //testSampleClientSession();
    // testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();
-    // testEchoServer();
+    testRebindSocket();
+    //testEchoServer();
     //testServerUsingSession();
     //testSimpleString();
     //testEastlVector();        // ken: not ready 

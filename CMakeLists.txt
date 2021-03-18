@@ -43,6 +43,10 @@ add_executable(app1
                 ${DEMO1_PATH}/pch.h
                 ${DEMO1_PATH}/SimpleSocketServer.cpp
                 ${DEMO1_PATH}/SimpleSocketServer.h
+                ${DEMO1_PATH}/SimpleNetAppSession.h                
+                ${DEMO1_PATH}/SimpleNetAppSession.cpp
+                ${DEMO1_PATH}/SimpleNetApp.h
+                ${DEMO1_PATH}/SimpleNetApp.cpp
             )
 
 
@@ -51,11 +55,12 @@ target_precompile_headers(app1 PRIVATE ${DEMO1_PATH}/pch.h)
 
 target_link_libraries(app1 PRIVATE ${CORE_LIB_NAME})
 target_link_libraries(app1 PRIVATE ${NET_ENGINE_NAME})
+target_link_libraries(app1 PRIVATE ${IMGUI_HELPER_NAME})
 target_link_libraries(app1 PRIVATE fmt::fmt)
 target_link_libraries(app1 PRIVATE EASTL)
 target_link_libraries(app1 PRIVATE EABase)
 target_link_libraries(app1 PRIVATE imgui::imgui)
-target_link_libraries(app1 PRIVATE ${IMGUI_HELPER_NAME})
+
 
 # For Testing 
 add_executable(test_main

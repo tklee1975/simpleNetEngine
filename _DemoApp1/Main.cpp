@@ -3,10 +3,20 @@
 #include <iostream>
 #include <fmt/core.h>
 #include "pch.h"
+//
+//#include "imgui.h"
+//#include "imgui_impl_sdl.h"
+//#include "imgui_impl_opengl3.h"
+//#include <stdio.h>
+//#include <SDL.h>
+
 
 #include <NetEngine.h>
 #include <CoreLib.h>
 #include "SimpleSocketServer.h"
+#include "SimpleNetApp.h"
+
+
 
 
 void startSocketServer() {
@@ -23,6 +33,16 @@ void startEchoServer() {
     server.start(2345);
 }
 
+void startSimpleNetApp() {
+    auto app = SimpleNetApp();
+    if(app.init() == false) {
+        std::cout << "Fail to init\n";
+        return;
+    }
+    
+    app.run();
+}
+
 
 int main() {
     fmt::print("Simple Network Engine\n");
@@ -31,7 +51,8 @@ int main() {
     
     //simpleNet::log("Server is started!");
     //startSocketServer();
-    startEchoServer();
+    // startEchoServer();
+    startSimpleNetApp();
     
     return 0;
 }

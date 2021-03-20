@@ -200,6 +200,7 @@ void testBaseImguiApp() {
         std::cout << "Fail to init\n";
         return;
     }
+    app.setBgColor(ColorYellow);
     
     app.run();
 }
@@ -255,10 +256,10 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testSimpleNetApp();
+    // testSimpleNetApp();
     // testImguiApp2();
     // testImguiApp1();
-    // testBaseImguiApp();
+    testBaseImguiApp();
     // testImgui();
     //testLog();
     // test1();

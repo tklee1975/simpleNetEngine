@@ -282,6 +282,11 @@ void BaseImguiApp::run()
     }
 }
 
+void BaseImguiApp::setBgColor(const ImColor &color)
+{
+    _clearColor = color;
+}
+
 bool BaseImguiApp::getInputKey(SDL_Keycode key)
 {
     auto s = SDL_GetScancodeFromKey(key);
@@ -289,97 +294,6 @@ bool BaseImguiApp::getInputKey(SDL_Keycode key)
 }
 
 
-// int main()
-// {
-//     SDL_Window *window = nullptr;
-//     SDL_GLContext gl_context = nullptr;
-//     // std::cout << "testing" << "\n'";
-//     // for(int i=0; i<20; i++) {
-//     //     fmt::print("i={}\n", i);
-//     // }
-
-//     int error = SDL_Init(SDL_INIT_EVERYTHING);
-//     if (error != 0)
-//     {
-//         std::cout << "Fail init. code=" << error << "\n";
-//         return 0;
-//     }
-
-//     // Decide GL+GLSL versions
-//     const char *glsl_version = "#version 150";
-//     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-//     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-//     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-//     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
-//     // Create window with graphics context
-//     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-//     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-//     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-//     SDL_WindowFlags window_flags = (SDL_WindowFlags)(
-//         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-//     window = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example",
-//                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-//                               window_flags);
-
-//     if (window == nullptr)
-//     {
-//         std::cout << "Window is null!\n";
-//         return 0;
-//     }
-
-//     gl_context = SDL_GL_CreateContext(window);
-//     SDL_GL_MakeCurrent(window, gl_context);
-//     SDL_GL_SetSwapInterval(1); // Enable vsync
-
-//     // Initialize OpenGL loader
-// #if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-//     bool err = gl3wInit() != 0;
-// #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
-//     bool err = glewInit() != GLEW_OK;
-// #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-//     bool err = gladLoadGL() == 0;
-// #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD2)
-//     bool err = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) == 0; // glad2 recommend using the windowing library loader instead of the (optionally) bundled one.
-// #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2)
-//     bool err = false;
-//     glbinding::Binding::initialize();
-// #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3)
-//     bool err = false;
-//     glbinding::initialize([](const char *name) { return (glbinding::ProcAddress)SDL_GL_GetProcAddress(name); });
-// #else
-//     bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
-// #endif
-//     if (err)
-//     {
-//         std::cout << "Failed to initialize OpenGL loader!";
-//         return 0;
-//     }
-
-
-
-//     IMGUI_CHECKVERSION();
-//     ImGui::CreateContext();
-
-//     // Setup Dear ImGui style
-//     ImGui::StyleColorsDark();
-//     //ImGui::StyleColorsClassic();
-
-//     // Setup Platform/Renderer backends
-//     std::cout << "Check 1\n";
-//     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-//     ImGui_ImplOpenGL3_Init(glsl_version);
-
-//     std::cout << "Check 2\n";
-//     // Update
-//     bool _running = true;
-//     while (_running)
-//     {
-//         _update(window, _running);
-//         _render(window);
-//     }
-//     return 0;
-// }
+//
 }
 

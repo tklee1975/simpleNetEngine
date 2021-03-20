@@ -1,6 +1,8 @@
 #!/bin/sh 
-MY_PATH=`pwd`
-cd ./build 
+BUILD_DIR=./build 
+
+MY_DIR=`pwd`
+cd $BUILD_DIR
 make  
-cd $MY_PATH
+cd $MY_DIR
 

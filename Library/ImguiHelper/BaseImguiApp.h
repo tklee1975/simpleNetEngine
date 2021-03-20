@@ -20,6 +20,7 @@ public:
     bool init();
     void run();
     void stopRun();
+    void setBgColor(const ImColor &color);
     
 protected:  // implemented by the subclass
     ImVec4 _clearColor; // = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);

@@ -24,9 +24,9 @@ void SimpleNetApp::drawShapes()
 {
 
     // Active position position
-    SNShapeHelper::drawRectAtCenter(_posP1, 30, SN_YELLOW);
+    SNShapeHelper::drawRectAtCenter(_posP1, 30, ColorYellow);
     
-    SNShapeHelper::drawRectAtCenter(_posP2, 30, SN_PURPLE);
+    SNShapeHelper::drawRectAtCenter(_posP2, 30, ColorPurple);
     //SNShapeHelper::drawRectAtCenter(ImVec2(100, 250), 50, ImColor(0, 255, 0));
 }
 

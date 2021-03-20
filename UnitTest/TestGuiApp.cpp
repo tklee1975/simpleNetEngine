@@ -66,7 +66,7 @@ void SampleGuiApp2::drawShapes()
     SNShapeHelper::drawRectAtCenter(ImVec2(100, 250), 50, ImColor(0, 255, 0));
     
     // Active position position
-    SNShapeHelper::drawRectAtCenter(_pos, 30, SN_YELLOW);
+    SNShapeHelper::drawRectAtCenter(_pos, 30, ColorYellow);
     //SNShapeHelper::drawRectAtCenter(ImVec2(100, 250), 50, ImColor(0, 255, 0));
 }
 

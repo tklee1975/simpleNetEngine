@@ -19,3 +19,6 @@ xcode_prj
 
 ## VSCode 
 .vscode
+
+## Vcpkg
+./externals/vcpkg

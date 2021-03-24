@@ -176,7 +176,7 @@ bool SNSocket::listen(int backLog)
     }
 
     std::cout << "Start Listening\n";
-    simpleNet::log("Waiting for incoming data");
+    LOG("Waiting for incoming data");
     
     return true;
 }
@@ -186,10 +186,10 @@ void SNSocket::connect(const SNSocketAddr& addr)
 {
     int ret = ::connect(_sock, &addr._addr, sizeof(addr._addr));
     if (ret < 0) {
-        log("connect: fail to connect: %d; error=%d", ret, errno);
+        ERROR_LOG("connect: fail to connect: %d; error=%d", ret, errno);
         throw SNError("connect");
     }
-    log("connect: Socket connected");
+    ERROR_LOG("connect: Socket connected");
 }
 
 SNSocketAcceptStatus SNSocket::attempAccept(SNSocket &acceptedSocket)
@@ -266,7 +266,7 @@ size_t SNSocket::availableBytesToRead()
     // returns the number of data bytesin the location pointed
     int result = ::ioctl(_sock, FIONREAD, &n);
     if (0 != result) {
-        log("ERROR: availableBytesToRead: result is %d errno=%d", result, errno);
+        ERROR_LOG("ERROR: availableBytesToRead: result is %d errno=%d", result, errno);
         throw SNError("availableBytesToRead");
     }
 

@@ -16,10 +16,6 @@
 using namespace simpleNet;
 using namespace std;
 
-void testSimpleLog()
-{
-    //SIMPLE_LOG("Testing");
-}
 
 //startsWith(const char *prefix);
 void testExtractCommands() {
@@ -79,7 +75,7 @@ void testStringAppend() {
 }
 
 void testStartsWith() {
-    log("testStartsWith");
+    LOG("testStartsWith");
     
     std::vector<SNString> testList;
     testList.push_back(SNString("12"));
@@ -100,7 +96,7 @@ void testStartsWith() {
 
 
 void testStringToInt() {
-    log("testStringToInt");
+    LOG("testStringToInt");
     
     std::vector<SNString> testList;
     testList.push_back(SNString("12"));
@@ -117,7 +113,7 @@ void testStringToInt() {
 }
 
 void testTrimStr() {
-    log("testTrimStr");
+    LOG("testTrimStr");
 
     SNString input = SNString("testing\n");
     
@@ -129,7 +125,7 @@ void testTrimStr() {
 }
 
 void testSplitStr() {
-    log("TestSplitStr");
+    LOG("TestSplitStr");
     
     const char *testStr = "mov 12 13";
     SNString str = SNString(testStr);
@@ -704,7 +700,9 @@ void testSockAddr() {
 }
 
 void testLog() {
-    simpleNet::log("testing: %d %d", 123, 2312);
+    LOG("testing: %d %d", 123, 2312);
+    ERROR_LOG("testing: %d %d", 123, 2312);
+    DEBUG_LOG("testing: %d %d", 123, 2312);
 }
 
 void test1() {
@@ -715,7 +713,6 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testSimpleLog();
     // testCin();
     // testIMGUI();             // ken: not ready
     /// testStringAppend();
@@ -738,7 +735,7 @@ void runSingleTest() {
     // testSimpleHelloServer();
     // testTcpBind();
     // testSockAddr();
-    // testLog();
+    testLog();
     // test1();
     
     std::cout << "End of Single Test\n";

@@ -12,9 +12,12 @@ namespace simpleNet {
 void _log(const char *format, va_list args);
 
 
-void log(const char * format, ...)
+void log(const char *tag, const char * format, ...)
 {
+    
+    std::cout << tag;
     va_list args;
+    
     va_start(args, format);
     //std::cout << "Log\n";
     _log(format, args);
@@ -41,7 +44,7 @@ void _log(const char *format, va_list args)
     // strcat(buf, "\n");
     
     //printf(format, args);
-    std::cout << "LOG: " << buf << "\n";
+    std::cout <<  buf << "\n";
     
     delete []  buf;
 }

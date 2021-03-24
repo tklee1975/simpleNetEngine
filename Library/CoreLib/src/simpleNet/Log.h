@@ -16,12 +16,17 @@
 
 #define MAX_LOG_LENGTH 2048
 
-//#define SIMPLE_LOG(...)       do{ simpleNet::gLog.write(\
+//#define LOG(...)       do{ simpleNet::gLog.write(\
 //                                simpleNet::Log::Level::Info,\
 //                                __VA_ARGS__); } while(false)
 
+#define LOG(...)          do{ simpleNet::log("[INFO]  :", __VA_ARGS__); } while(false)
+#define ERROR_LOG(...)    do{ simpleNet::log("[ERROR] :", __VA_ARGS__); } while(false)
+#define DEBUG_LOG(...)    do{ simpleNet::log("[DEBUG] :", __VA_ARGS__); } while(false)
+
+
 namespace simpleNet {
-    void log(const char * format, ...);
+    void log(const char *tag, const char * format, ...);
 
     class Log : public NonCopyable {
         public:
@@ -42,7 +47,8 @@ namespace simpleNet {
                 //onWrite(lv, s);
             }
     };
-
+    
+    
     //extern Log gLog;
 }
 

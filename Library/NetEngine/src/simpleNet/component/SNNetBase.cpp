@@ -41,7 +41,7 @@ void SNNetBase::initSocket()
 bool SNNetBase::checkIncomingData()
 {
     if(_session == NULL) {
-        log("checkIncomingData: session is NULL");
+        LOG("checkIncomingData: session is NULL");
         return false;
     }
     

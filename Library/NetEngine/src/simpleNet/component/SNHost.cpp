@@ -78,7 +78,7 @@ void SNHost::initClientSocket()
 bool SNHost::attemptAccept()
 {
     if(_serverSocket == NULL) {
-        log("ERROR: attemptAccept: fail: socket is NULL");
+        ERROR_LOG("attemptAccept: fail: socket is NULL");
         throw SNError("attemptAccept fail: socket not ready");
     }
     initClientSocket();

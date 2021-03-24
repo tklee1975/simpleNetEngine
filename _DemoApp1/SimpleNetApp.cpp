@@ -314,7 +314,7 @@ void SimpleNetApp::onConnected()
 
 void SimpleNetApp::onReceiveCommand(SNString &cmd)
 {
-    log("onReceiveCommand: %s", cmd.c_str());
+    LOG("onReceiveCommand: %s", cmd.c_str());
     if(cmd.str() == "up") {
         movePlayer(1, ImVec2(0, -30));
     } else if(cmd.str() == "down") {
@@ -332,11 +332,11 @@ void SimpleNetApp::handleMoveCommand(SNString &cmd)
 {
     cmd.rtrim();
     
-    log("RECEIVE: cmd=[%s]", cmd.c_str());
+    LOG("RECEIVE: cmd=[%s]", cmd.c_str());
     
     std::vector<SNString> tokens = cmd.split(" ");
     if(tokens.size() < 3) {
-        log("handleMoveCommand: incorrect token count");
+        LOG("handleMoveCommand: incorrect token count");
         return;
     }
     int moveX = tokens[1].toInt();
@@ -392,7 +392,7 @@ void SimpleNetApp::sendCommand(SNString &cmd)
 {
     if(_isHost) {
         if(_host.getSession() == NULL) {
-            log("SimpleNetApp.sendCommand: host.session not ready");
+            LOG("SimpleNetApp.sendCommand: host.session not ready");
             return;
         }
         
@@ -400,7 +400,7 @@ void SimpleNetApp::sendCommand(SNString &cmd)
         _host.queueToOutBuffer(cmd);
     } else {
         if(_client.getSession() == NULL) {
-            log("SimpleNetApp.sendCommand: client.session not ready");
+            LOG("SimpleNetApp.sendCommand: client.session not ready");
             return;
         }
         _client.queueToOutBuffer(cmd);

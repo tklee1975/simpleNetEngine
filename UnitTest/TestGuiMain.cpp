@@ -245,7 +245,7 @@ void testSimpleNetApp()
 
 
 void testLog() {
-    simpleNet::log("testing: %d %d", 123, 2312);
+    //simpleNet::log("testing: %d %d", 123, 2312);
 }
 
 void test1() {

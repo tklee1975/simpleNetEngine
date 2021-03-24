@@ -107,7 +107,7 @@ void SNSession::flushBuffer()
 {
     int sendCount = sendData(_outBuffer);
     if(sendCount < 0) {
-        log("ERROR: flushBuffer. sendData error");
+        ERROR_LOG("flushBuffer. sendData error");
         return;
     }
     

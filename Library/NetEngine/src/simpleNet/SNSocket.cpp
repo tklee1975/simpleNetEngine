@@ -10,7 +10,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <exception>
-#include <CoreLib.h>
+#include <simpleNet/CoreLib.h>
 #include <fcntl.h> /* Added for the nonblocking socket */
 
 #define BACKLOG 10

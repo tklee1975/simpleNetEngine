@@ -11,8 +11,8 @@ message("Core Library")
 
 ## Fetch the sources and add the the library
 file(GLOB_RECURSE search_src_files 
-	"*.cpp"
-	"*.h"
+	"src/*.cpp"
+	"src/*.h"
 )
 ## message("search_src_files = ${search_src_files}")
 foreach(FILE ${search_src_files}) 
@@ -27,4 +27,5 @@ add_library(CoreLib ${search_src_files})
 
 
 # Define the Target 
-target_include_directories(CoreLib PUBLIC ./)
+target_include_directories(CoreLib PUBLIC ./src/)
+target_link_libraries(CoreLib PUBLIC fmt::fmt)

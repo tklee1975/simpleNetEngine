@@ -2,10 +2,10 @@
 //#include "doctest.h"
 #include <stdio.h>
 #include <iostream>
-#include <CoreLib.h>
+#include <simpleNet/CoreLib.h>
 #include <ImguiHelper.h>
 #include <fmt/core.h>
-#include <session/SNEchoSession.h>
+#include <simpleNet/session/SNEchoSession.h>
 #include "TestNetSession.h"
 #include <fcntl.h> /* Added for the nonblocking socket */
 #include "TestGuiApp.h"

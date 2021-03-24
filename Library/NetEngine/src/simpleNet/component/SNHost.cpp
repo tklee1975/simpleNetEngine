@@ -6,10 +6,10 @@
 //
 
 #include "SNHost.h"
-#include "SNSessionFactory.h"
-#include "SNSocket.h"
+#include "../SNSessionFactory.h"
+#include "../SNSocket.h"
 #include <iostream>
-#include <CoreLib.h>
+#include <simpleNet/CoreLib.h>
 
 
 namespace simpleNet {

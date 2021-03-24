@@ -1,11 +1,10 @@
 # Setting 
 cmake_minimum_required(VERSION 3.10)
-project(SimpleNetNetEngine)
 
-# Debug message 
-# set(ABC "Hey")
-# message("Hello World ${ABC}")
-message("Network Engine Library")
+
+set(PROJECT_NAME NetEngine) 
+message("=== ${PROJECT_NAME} ===")
+project(${PROJECT_NAME})
 
 # Define Source 
 
@@ -15,8 +14,8 @@ set(CORE_LIB_PATH       "Library/CoreLib")
 
 ## Fetch the sources and add the the library
 file(GLOB_RECURSE search_src_files 
-	"*.cpp"
-	"*.h"
+	"src/*.cpp"
+	"src/*.h"
 )
 ## message("search_src_files = ${search_src_files}")
 foreach(FILE ${search_src_files}) 
@@ -27,9 +26,13 @@ foreach(FILE ${search_src_files})
 	source_group("${GROUP}" FILES "${FILE}")
 endforeach()
 
-add_library(NetEngine ${search_src_files})
+
+add_library(${PROJECT_NAME} ${search_src_files})
 
 
 # Define the Target 
-target_include_directories(NetEngine PUBLIC ./)
-target_link_libraries(NetEngine PRIVATE ${CORE_LIB_NAME})
+target_include_directories(${PROJECT_NAME} PUBLIC ./src/)
+#set_target_properties (${PROJECT_NAME} PROPERTIES FOLDER simpleNet)
+
+# Linked Library  
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CORE_LIB_NAME})

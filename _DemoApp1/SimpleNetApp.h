@@ -9,8 +9,8 @@
 #define SimpleNetApp_h
 
 #include <stdio.h>
-#include <CoreLib.h>
-#include <NetEngine.h>
+#include <simpleNet/CoreLib.h>
+#include <simpleNet/NetEngine.h>
 #include <ImguiHelper.h>
 
 using namespace simpleNet;

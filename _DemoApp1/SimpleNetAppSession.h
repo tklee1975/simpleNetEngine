@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 #include <stdio.h>
-#include <NetEngine.h>
+#include <simpleNet/NetEngine.h>
 
 using namespace simpleNet;
 

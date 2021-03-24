@@ -2,18 +2,24 @@
 //#include "doctest.h"
 #include <stdio.h>
 #include <iostream>
-#include <CoreLib.h>
-#include <NetEngine.h>
+#include <simpleNet/CoreLib.h>
+#include <simpleNet/NetEngine.h>
+#include <simpleNet/session/SNEchoSession.h>
 #include <EASTL/vector.h>
 #include <EASTL/fixed_vector.h>
 #include <fmt/core.h>
-#include <session/SNEchoSession.h>
+
 #include "TestNetSession.h"
 #include <fcntl.h> /* Added for the nonblocking socket */
 #include "../_DemoApp1/SimpleNetAppSession.h"
 
 using namespace simpleNet;
 using namespace std;
+
+void testSimpleLog()
+{
+    //SIMPLE_LOG("Testing");
+}
 
 //startsWith(const char *prefix);
 void testExtractCommands() {
@@ -709,6 +715,7 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
+    testSimpleLog();
     // testCin();
     // testIMGUI();             // ken: not ready
     /// testStringAppend();
@@ -722,7 +729,7 @@ void runSingleTest() {
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();
-    testRebindSocket();
+    //testRebindSocket();
     //testEchoServer();
     //testServerUsingSession();
     //testSimpleString();

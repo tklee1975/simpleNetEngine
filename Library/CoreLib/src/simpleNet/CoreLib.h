@@ -6,5 +6,6 @@
 #include "Log.h"
 #include "Common.h"
 #include "SNString.h"
+#include "Nocopyable.h"
 
 #endif 

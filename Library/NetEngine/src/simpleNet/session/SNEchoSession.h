@@ -9,8 +9,8 @@
 #define SNEchoSession_h
 
 #include <stdio.h>
-#include "SNSession.h"
-#include "SNSessionFactory.h"
+#include "../SNSession.h"
+#include "../SNSessionFactory.h"
 
 namespace simpleNet {
     

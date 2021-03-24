@@ -10,8 +10,8 @@
 #include <fmt/core.h>
 
 // My Library
-#include <CoreLib.h>
-#include <NetEngine.h>
+#include <simpleNet/CoreLib.h>
+#include <simpleNet/NetEngine.h>
 
 // 
 using namespace simpleNet;

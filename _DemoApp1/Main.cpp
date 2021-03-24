@@ -11,8 +11,8 @@
 //#include <SDL.h>
 
 
-#include <NetEngine.h>
-#include <CoreLib.h>
+#include <simpleNet/NetEngine.h>
+#include <simpleNet/CoreLib.h>
 #include "SimpleSocketServer.h"
 #include "SimpleNetApp.h"
 

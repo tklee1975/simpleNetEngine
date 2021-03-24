@@ -25,6 +25,7 @@
 #endif
 
 #include <vector>
+#include <simpleNet/CoreLib.h>
 
 #pragma once
 
@@ -48,7 +49,7 @@ public:
     struct sockaddr _addr;
 };
 
-class SNSocket {
+class SNSocket : NonCopyable {
 public:
     
     // Data

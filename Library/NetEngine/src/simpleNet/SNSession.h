@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <vector>
-#include <CoreLib.h>
+#include <simpleNet/CoreLib.h>
 
 #include "SNSocket.h"
 

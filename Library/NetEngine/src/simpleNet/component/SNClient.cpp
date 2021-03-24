@@ -6,8 +6,8 @@
 //
 
 #include "SNClient.h"
-#include "SNSessionFactory.h"
-#include "SNSocket.h"
+#include "../SNSessionFactory.h"
+#include "../SNSocket.h"
 #include <iostream>
 
 

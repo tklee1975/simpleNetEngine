@@ -17,6 +17,27 @@ using namespace simpleNet;
 using namespace std;
 
 
+void testStr()
+{
+    SNString str("Hello String");
+    
+    std::string myStr = str.str();  // ken: copy assignment happened here
+    myStr.append("123");
+    
+    // Testing str() const
+    cout << "SNString: " << str.str() << "\n";
+    cout << "myStr: " << myStr << "\n";
+    const std::string& strRef = str.str();  //
+    // strRef.append("hello");                 // ken: cannot modify const &
+    
+    const char *cStr = str.c_str();
+    printf("cstr: %s\n", cStr);
+    // strcpy(cStr, "testing");                   // ken:
+    
+    //str
+    //const
+}
+
 //startsWith(const char *prefix);
 void testExtractCommands() {
     
@@ -130,7 +151,9 @@ void testSplitStr() {
     const char *testStr = "mov 12 13";
     SNString str = SNString(testStr);
     
-    std::vector<SNString> tokens = str.split(" ");
+    std::vector<SNString> tokens;
+    
+    str.split(tokens, " ");
     
     for(int i=0; i<tokens.size(); i++) {
         SNString str = tokens[i];
@@ -277,7 +300,7 @@ void testClient() {
     const char *msg = "Testing";
     sock.send(msg, strlen(msg));
     
-	std::vector<char> buf;
+	std::vector<u8> buf;
 	for(;;) {
 		size_t n = sock.availableBytesToRead();
         if (n == 0) {
@@ -392,12 +415,12 @@ void testNonBlockingServer() {
     std::cout << "Before Accept\n";
     for(;;) {
         SNSocketAcceptStatus result = serverSocket.attempAccept(clientSocket);
-        if(result == SNSocketAcceptFail) {// No pending
+        if(result == SNSocketAcceptStatus::Fail) {// No pending
             std::cout << "Client fail to accept\n";
             return;
         }
         
-        if(result == SNSocketAcceptSuccess) {// No pending
+        if(result == SNSocketAcceptStatus::Success) {// No pending
             break;
         }
     
@@ -589,8 +612,8 @@ void testSimpleEchoServer() {
     }
     std::cout << "Client success to accept\n";
         
-    std::vector<char> buf;
-    std::vector<char> outBuf;
+    std::vector<u8> buf;
+    std::vector<u8> outBuf;
     for(;;) {
         size_t n = clientSocket.availableBytesToRead();
         if(n <= 0) {
@@ -680,7 +703,7 @@ void testTcpBind() {
     sock.createTCP();
     sock.bind(addr);
     
-    std::vector<char> buf;
+    std::vector<u8> buf;
 
     for(;;) {
         sock.recv(buf, 4);
@@ -713,13 +736,14 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
+    // testStr();
     // testCin();
     // testIMGUI();             // ken: not ready
     /// testStringAppend();
     // testStartsWith();
     // testStringToInt();
     // testTrimStr();
-    // testSplitStr();
+    testSplitStr();
     //testExtractCommands();
     //testSampleClientSession();
    // testSampleHostSession();
@@ -735,7 +759,7 @@ void runSingleTest() {
     // testSimpleHelloServer();
     // testTcpBind();
     // testSockAddr();
-    testLog();
+    // testLog();
     // test1();
     
     std::cout << "End of Single Test\n";

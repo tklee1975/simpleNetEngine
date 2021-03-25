@@ -171,11 +171,11 @@ bool SNSocket::listen(int backLog)
     int ret = ::listen(_sock, BACKLOG);
     if (ret != 0) {
         //throw MyError("bind");
+        
         std::cout << "fail to bind socket\n";
         return false;
     }
 
-    std::cout << "Start Listening\n";
     LOG("Waiting for incoming data");
     
     return true;
@@ -200,14 +200,14 @@ SNSocketAcceptStatus SNSocket::attempAccept(SNSocket &acceptedSocket)
     int value = ::accept(_sock, nullptr, nullptr);
     if(value == -1) {
         if (errno == EWOULDBLOCK) {
-            return SNSocketAcceptPending;
+            return SNSocketAcceptStatus::Pending;
         }
-        return SNSocketAcceptFail;
+        return SNSocketAcceptStatus::Fail;
     }
     
     acceptedSocket._sock = value;
     
-    return SNSocketAcceptSuccess;
+    return SNSocketAcceptStatus::Success;
 //    if (c == INVALID_SOCKET) {
 //        return false;
 //    }
@@ -234,6 +234,12 @@ bool SNSocket::accept(SNSocket &acceptedSocket)
 
 
 int SNSocket::send(const char* data, size_t dataSize)
+{
+    return send(reinterpret_cast<const u8*>(data), dataSize);
+}
+
+
+int SNSocket::send(const u8* data, size_t dataSize)
 {
     if (dataSize > INT_MAX) {
         std::cout << "Send dataSize too big\n";
@@ -277,7 +283,8 @@ size_t SNSocket::availableBytesToRead()
 
 
 
-void SNSocket::recv(std::vector<char> & buf, size_t bytesToRecv) {
+void SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
+{
     buf.clear();
     
     if (bytesToRecv > INT_MAX) {

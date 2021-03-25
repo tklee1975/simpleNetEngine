@@ -22,12 +22,12 @@ public:
     SNSession(SNSocket *socket);
     ~SNSession();
 
-    SNSocket *_socket;      // ken: the socketing connecting the client or server
+    SNSocket *_socket = nullptr;      // ken: the socketing connecting the client or server
     bool isHost;           
     
     
     
-    size_t sendData(std::vector<char> &dataBuf);
+    size_t sendData(std::vector<u8> &dataBuf);
     void sendString(SNString &str);     // ken: is sendString(SNString *str) better??
     void sendString(const char *str);
     
@@ -45,11 +45,11 @@ public:
 protected:  // implemented by the subclass
     virtual void onConnect() = 0;
     virtual void onDisconnect() {}
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead); // ken: use & reference to save copy
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead); // ken: use & reference to save copy
     
 private:
-    std::vector<char> _outBuffer;
-    std::vector<char> _inBuffer;            // ken: use to store the incoming buffer
+    std::vector<u8> _outBuffer;
+    std::vector<u8> _inBuffer;            // ken: use to store the incoming buffer
     bool _isAlive;
     
     

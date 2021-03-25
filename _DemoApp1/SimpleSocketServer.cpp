@@ -46,8 +46,8 @@ void SimpleSocketServer::start(int port)
     }
     std::cout << "Client success to accept\n";
         
-    std::vector<char> buf;
-    std::vector<char> outBuf;
+    std::vector<u8> buf;
+    std::vector<u8> outBuf;
     for(;;) {
         size_t n = clientSocket.availableBytesToRead();
         if(n <= 0) {
@@ -69,8 +69,10 @@ void SimpleSocketServer::start(int port)
         SNString returnMsg = SNString("ECHO: ");
         returnMsg.append(msg);
         
+        const char *char_pointer2 = reinterpret_cast<char*>(outBuf.data());
+        
         //outBuf = "ECHO: ";
-        returnMsg.copyTo(outBuf);
+        //returnMsg.copyTo(char_pointer2);
         
         clientSocket.send(outBuf.data(), outBuf.size());
     }

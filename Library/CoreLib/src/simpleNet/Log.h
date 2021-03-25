@@ -24,7 +24,7 @@
 #define ERROR_LOG(...)    do{ simpleNet::log("[ERROR] :", __VA_ARGS__); } while(false)
 #define DEBUG_LOG(...)    do{ simpleNet::log("[DEBUG] :", __VA_ARGS__); } while(false)
 
-
+// ken: note: write a better version using fmt::fmt later
 namespace simpleNet {
     void log(const char *tag, const char * format, ...);
 

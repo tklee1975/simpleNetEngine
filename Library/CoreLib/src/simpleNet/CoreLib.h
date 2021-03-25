@@ -1,11 +1,9 @@
-#ifndef __KC_CORE_LIB
-#define __KC_CORE_LIB
+#pragma once
 
-#define KC_CORE_LIB_VERSION     "0.0.1"
+const char KC_CORE_LIB_VERSION[] = "0.0.1";
 
 #include "Log.h"
 #include "Common.h"
 #include "SNString.h"
 #include "Nocopyable.h"
-
-#endif 
+#include "Type.h"

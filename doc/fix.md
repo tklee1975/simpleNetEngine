@@ -11,9 +11,54 @@
 ```
 
 
+
+### emplace_back rather push_back()
+
+this help to save one copy action 
+
+### Exception 
+- 
+
+User Trigger -> Try & Catch 
+
+Fail to recover 
+
+### 
+Use auto  
+
+### pragma once 
+
+#ifndef _XXXX 
+#define _XXXX
+
+
+### 
+Use String_view 
+-> Help no allocation 
+
+
+### 
+SNSession *xxx 
+-> unique_ptr<SNSession>
+
+## Google 
+Prefer int over u_int   -> 
+
+Take care of u_int 
+
+## Resize 
+- Resize to smaller, no cost at all 
+
+
+## Override 
+add override to prevent mismatch method 
+
 ## Last Error
 ```
+
 ```
+
+not NULL -> nullptr
 
 +    using NativeFD = int;
 

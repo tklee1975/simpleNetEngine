@@ -125,7 +125,10 @@ void SimpleNetApp::drawGuiHost()
 
 bool SimpleNetApp::setupSockAddress(SNString &str, int port)
 {
-    std::vector<SNString> tokens = str.split(".");
+    std::vector<SNString> tokens;
+    
+    str.split(tokens, ".");
+    
     if(tokens.size() != 4) {
         _errorMsg.set("Invalid IP Address");
         return false;
@@ -334,7 +337,9 @@ void SimpleNetApp::handleMoveCommand(SNString &cmd)
     
     LOG("RECEIVE: cmd=[%s]", cmd.c_str());
     
-    std::vector<SNString> tokens = cmd.split(" ");
+    std::vector<SNString> tokens;
+    cmd.split(tokens, " ");
+    
     if(tokens.size() < 3) {
         LOG("handleMoveCommand: incorrect token count");
         return;
@@ -343,6 +348,7 @@ void SimpleNetApp::handleMoveCommand(SNString &cmd)
     int moveY = tokens[2].toInt();
     
     int pid = _isHost ? 1 : 0;  //
+    
     movePlayer(pid, ImVec2(moveX, moveY));
 }
 

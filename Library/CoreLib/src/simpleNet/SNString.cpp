@@ -17,21 +17,22 @@ namespace simpleNet {
         :_buf(str)
     {}
  
-    std::string SNString::str() {
+    const std::string &SNString::str() const
+    {
         return _buf;
     }
 
-    const char * SNString::c_str()
+    const char * SNString::c_str() const
     {
         return _buf.c_str();
     }
 
-    bool SNString::isEmpty()
+    bool SNString::isEmpty() const 
     {
         return _buf.empty();
     }
 
-    int SNString::toInt()
+    int SNString::toInt() const
     {
         try {
             return std::stoi(_buf);
@@ -40,24 +41,23 @@ namespace simpleNet {
         }
     }
 
-    bool SNString::startsWith(const char *prefix)
+    bool SNString::startsWith(const char *prefix) const
     {
-        return _buf.rfind(prefix) == 0;
+        int len = strlen(prefix);
+        return strncmp(_buf.c_str(), prefix, len);
     }
 
     void SNString::rtrim()
     {
         // https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
-        _buf.erase(
-                   std::find_if(_buf.rbegin(), _buf.rend(), [](unsigned char ch) {
+        // ken: optimise later
+        _buf.erase(std::find_if(_buf.rbegin(), _buf.rend(), [](unsigned char ch) {
                         return !std::isspace(ch);
                     }).base(), _buf.end());
     }
 
-    std::vector<SNString> SNString::split(const char *delimiter)
+    void SNString::split(std::vector<SNString> &list, const char *delimiter)
     {
-        std::vector<SNString> list;
-            
         std::string s = std::string(_buf);
         size_t pos = 0;
         std::string token;
@@ -65,12 +65,12 @@ namespace simpleNet {
         while ((pos = s.find(delimiter)) != std::string::npos)
         {
             token = s.substr(0, pos);
-            list.push_back(SNString(token.c_str()));
+            list.emplace_back(token.c_str());
             s.erase(0, pos + strlen(delimiter));
         }
         
-        list.push_back(SNString(s.c_str()));
-        return list;
+        list.emplace_back(s.c_str());
+        //return list;
     }
 
     void SNString::set(const char *newStr){
@@ -84,6 +84,15 @@ namespace simpleNet {
     }
     
     void SNString::copyTo(std::vector<char> &outBuf) {
+        // Reference:
+        //  https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar
+        outBuf.clear();
+        std::copy(_buf.begin(), _buf.end(), std::back_inserter(outBuf));
+
+    }
+
+    void SNString::copyTo(std::vector<uint8_t> &outBuf)
+    {
         // Reference:
         //  https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar
         outBuf.clear();

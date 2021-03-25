@@ -31,10 +31,10 @@
 
 namespace simpleNet {
 
-enum SNSocketAcceptStatus {
-    SNSocketAcceptSuccess = 1,
-    SNSocketAcceptPending = 0,
-    SNSocketAcceptFail = -1,
+enum class SNSocketAcceptStatus {
+    Success,
+    Pending,
+    Fail,
 };
 
 class SNSocketAddr {
@@ -76,10 +76,11 @@ public:
     void connect(const SNSocketAddr& addr);
     bool listen(int backLog);
     //int send(const SNSocketAddr& addr, const char* data, size_t dataSize);    // no use??
-    void recv(std::vector<char> & buf, size_t bytesToRecv);
+    void recv(std::vector<u8> & buf, size_t bytesToRecv);
     bool accept(SNSocket &acceptedSocket);
     SNSocketAcceptStatus attempAccept(SNSocket &acceptedSocket);
     
+    int send(const u8* data, size_t dataSize);
     int send(const char* data, size_t dataSize);
     size_t availableBytesToRead();
     int getSockFd();

@@ -15,30 +15,37 @@ SNSession::SNSession(SNSocket *socket)
 {
     _socket = socket;
     
-    _isAlive = _socket == NULL ? false : true;
+    _isAlive = _socket == nullptr ? false : true;
 }
 
 SNSession::~SNSession()
 {
-    if(_socket != NULL) {
+    if(_socket != nullptr)
+    {
         _socket->close();
+        _socket = nullptr;
     }
 }
     
-void SNSession::onRecvData(std::vector<char> &buf, size_t &nRead)
+void SNSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 {
     // Need implemented by child class
     std::cout << "onRecvData: " << nRead << " bytes received\n";
 }
 
-size_t SNSession::sendData(std::vector<char> &dataBuf)
+size_t SNSession::sendData(std::vector<u8> &dataBuf)
 {
+    if(!_socket) {
+        return 0;
+    }
+    
+    
     return _socket->send(dataBuf.data(), dataBuf.size());
 }
 
 size_t SNSession::availableBytesToRead()
 {
-    if(_socket == NULL) {
+    if(!_socket) {
         return 0;
     }
     
@@ -57,6 +64,10 @@ void SNSession::receiveData() {
     if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
         //sleep(1);       // 1 second     //
         return;
+    }
+    
+    if(!_socket) {
+        return 0;
     }
     
     _socket->recv(_inBuffer, nRead);
@@ -124,7 +135,7 @@ void SNSession::flushBuffer()
 void SNSession::putBufferWithStr(SNString &str)
 {
     //_outBuffer.ins
-    str.appendTo(_outBuffer);
+    //str.appendTo(reinterpret_cast<std:vector<char *>>(_outBuffer));
 }
 
 void SNSession::sendString(SNString &str)
@@ -132,7 +143,7 @@ void SNSession::sendString(SNString &str)
     // ken: TODO: Add a queue to prevent buffer ov
 
     
-    str.copyTo(_outBuffer);     // the outBuffer is clear here...!!!
+   // str.copyTo(_outBuffer);     // the outBuffer is clear here...!!!
     
     // Reference here!!!
     sendData(_outBuffer);

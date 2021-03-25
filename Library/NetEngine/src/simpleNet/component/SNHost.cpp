@@ -85,11 +85,11 @@ bool SNHost::attemptAccept()
     //SNSocket sock = *_clientSocket;     // ken: HACK: is it okay?
     
     SNSocketAcceptStatus status = _serverSocket->attempAccept(*_mainSocket);
-    if(status == SNSocketAcceptFail) {
+    if(status == SNSocketAcceptStatus::Fail) {
         throw SNError("attemptAccept fail");
     }
     
-    if(status == SNSocketAcceptPending) {
+    if(status == SNSocketAcceptStatus::Pending) {
         return false;
     }
     

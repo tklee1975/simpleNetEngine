@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <simpleNet/CoreLib.h>
 
 namespace simpleNet {
 
@@ -20,21 +21,22 @@ public:
     SNString();
     SNString(const char *str);
     
-    std::string str();
-    const char * c_str();
+    const std::string &str() const;
+    const char * c_str() const;
     
-    std::vector<SNString> split(const char *delimiter);
+    void split(std::vector<SNString> &list, const char *delimiter);
     
     void set(const char *newStr);
     void append(const char *newStr);
     void copyTo(std::vector<char> &outBuf);
+    void copyTo(std::vector<uint8_t> &outBuf);
     void appendTo(std::vector<char> &outBuf);
     
-    bool isEmpty();
+    bool isEmpty() const;
     
-    int toInt();
+    int toInt() const;
     
-    bool startsWith(const char *prefix);
+    bool startsWith(const char *prefix) const;
     
     void rtrim();
 private:

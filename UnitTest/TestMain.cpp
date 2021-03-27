@@ -48,16 +48,18 @@ void testExtractCommands() {
     };
     
     SimpleHostSession session = SimpleHostSession(nullptr);
+    std::vector<SNString> result;
     
     for(int i=0; i<3; i++) {
         int len = strlen(testInput[i]);
-        std::vector<char> buffer(testInput[i], testInput[i]+len);
+        std::vector<u8> buffer(testInput[i], testInput[i]+len);
         
         string bufferStr = string(buffer.begin(), buffer.end());
         cout << "buffer: [" << bufferStr << "]\n";
         
         buffer[len] = '\0';
-        std::vector<SNString> result = session.extractCommands(buffer);
+        
+        session.extractCommands(buffer, result);
         
         for(int i=0; i<result.size(); i++) {
             cout << "RESULT-" << i << ": " << result[i].str() << "\n";
@@ -76,9 +78,51 @@ void testExtractCommands() {
 //    cout << data << "\n";
 }
 
+void testStringAppendU8() {
+    SNString str = SNString("testing-");
+    std::vector<u8> buffer;
+    char data[] = "abcdefg";
+    for(char c : data) { buffer.push_back(c); }
+    
+    std::string sStr;
+    sStr.append(buffer.begin(), buffer.end());
+    cout << "sStr: " << sStr << "\n";
+    
+    
+    
+//    str.append(buffer.begin(), buffer.end());
+//    cout << "str: " << str.str() << "\n";
+//
+//    str.appendTo(buffer);
+//    string strValue;
+//
+//    strValue = string(buffer.begin(), buffer.end());
+//    cout << "buffer: " << strValue << "\n";
+//
+//    str.appendTo(buffer);
+//    strValue = string(buffer.begin(), buffer.end());
+//    cout << "buffer: " << strValue << "\n";
+//
+//    str.appendTo(buffer);
+//    strValue = string(buffer.begin(), buffer.end());
+//    cout << "buffer: " << strValue << "\n";
+//
+    
+}
+
+void testStringAppendTo() {
+    SNString str = SNString("testing-");
+    std::vector<u8> buffer;
+    
+    str.appendTo(buffer);
+    string strValue(buffer.begin(), buffer.end());
+    
+    cout << strValue << "\n";
+}
+
 void testStringAppend() {
     SNString str = SNString("testing-");
-    std::vector<char> buffer;
+    std::vector<u8> buffer;
     
     str.appendTo(buffer);
     string strValue;
@@ -93,6 +137,8 @@ void testStringAppend() {
     str.appendTo(buffer);
     strValue = string(buffer.begin(), buffer.end());
     cout << "buffer: " << strValue << "\n";
+    
+    
 }
 
 void testStartsWith() {
@@ -227,9 +273,10 @@ void testSampleHostSession()
         host.checkNetwork();
         counter++;
         
-        if((counter % 1000000) == 0) {
+        if((counter % 10000) == 0) {
             SNString test = SNString("100 tick passed\n");
             host.queueToOutBuffer(test);
+            host.sendDataOut();
 //            SNSession *session = host.getSession();
 //            if(session != NULL) {
 //                session->sendString("100 tick passed\n");
@@ -739,14 +786,16 @@ void runSingleTest() {
     // testStr();
     // testCin();
     // testIMGUI();             // ken: not ready
-    /// testStringAppend();
-    // testStartsWith();
+    // testStringAppendU8();
+    //testStringAppend();
+    // testStringAppendTo();
+    //testStartsWith();
     // testStringToInt();
     // testTrimStr();
-    testSplitStr();
+    //testSplitStr();
     //testExtractCommands();
     //testSampleClientSession();
-   // testSampleHostSession();
+    testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();

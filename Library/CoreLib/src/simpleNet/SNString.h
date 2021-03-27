@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include "Type.h"
 #include <simpleNet/CoreLib.h>
 
 namespace simpleNet {
@@ -27,10 +28,18 @@ public:
     void split(std::vector<SNString> &list, const char *delimiter);
     
     void set(const char *newStr);
+    
     void append(const char *newStr);
+    void append(const std::string &sStr);
+    //template <class InputIterator>
+    //void append(InputIterator first, const InputIterator last);
+//    void append(std::vector::iterator<char *> first,
+//                std::vector::iterator<char *> last);
+//    
+    
     void copyTo(std::vector<char> &outBuf);
-    void copyTo(std::vector<uint8_t> &outBuf);
-    void appendTo(std::vector<char> &outBuf);
+    void copyTo(std::vector<u8> &outBuf);
+    void appendTo(std::vector<u8> &outBuf);
     
     bool isEmpty() const;
     

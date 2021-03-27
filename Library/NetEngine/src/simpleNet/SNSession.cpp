@@ -67,7 +67,7 @@ void SNSession::receiveData() {
     }
     
     if(!_socket) {
-        return 0;
+        return;
     }
     
     _socket->recv(_inBuffer, nRead);
@@ -125,7 +125,7 @@ void SNSession::flushBuffer()
     
     if(sendCount > 0) {
         std::string strValue = std::string(_outBuffer.begin(), _outBuffer.end());
-        std::cout << "flushBuffer: " << strValue << " count:"<< sendCount << "\n";
+        LOG("%s count:%d", strValue.c_str(), sendCount);
     }
     
     _outBuffer.erase(_outBuffer.begin(), _outBuffer.begin() + sendCount);
@@ -135,10 +135,12 @@ void SNSession::flushBuffer()
 void SNSession::putBufferWithStr(SNString &str)
 {
     //_outBuffer.ins
-    //str.appendTo(reinterpret_cast<std:vector<char *>>(_outBuffer));
+    //str.
+    str.appendTo(_outBuffer);
+    // str.app
 }
 
-void SNSession::sendString(SNString &str)
+void SNSession::sendString(const SNString &str)
 {
     // ken: TODO: Add a queue to prevent buffer ov
 

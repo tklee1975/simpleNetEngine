@@ -26,22 +26,25 @@ void SimpleHostSession::onDisconnect()
     std::cout << "Client disconnected\n";
 }
 
-void SimpleHostSession::onRecvData(std::vector<char> &buf, size_t &nRead)
+void SimpleHostSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 {
     if(nRead == 0) {
         return;
     }
+    
     if(app == nullptr) {
         return;
     }
     
     buf[nRead] = '\0';
     
-    std::vector<char> cleanBuffer = std::vector<char>(buf.begin(), buf.begin()+nRead);  // ken: HACK: how to make it better, no need the copy action
-    std::vector<SNString> cmdList = extractCommands(cleanBuffer);
+    std::vector<u8> cleanBuffer = std::vector<u8>(buf.begin(), buf.begin()+nRead);  // ken: HACK: how to make it better, no need the copy action
     
-    for(int i=0; i<cmdList.size(); i++) {
-        app->onReceiveCommand(cmdList[i]);
+    _cmdList.clear();
+    extractCommands(cleanBuffer, _cmdList);
+    
+    for(int i=0; i<_cmdList.size(); i++) {
+        app->onReceiveCommand(_cmdList[i]);
     }
     
     
@@ -71,15 +74,16 @@ void SimpleHostSession::onRecvData(std::vector<char> &buf, size_t &nRead)
 }
 
 
-std::vector<SNString> SimpleHostSession::extractCommands(std::vector<char> &buf)
+void SimpleHostSession::extractCommands(
+        std::vector<u8> &buf, std::vector<SNString> &_outCmds)
 {
     std::string debugStr;
     std::vector<SNString> result;
     
     //result.push_back(SNString("testing"));
     
-    std::vector<char>::iterator it;
-    std::vector<char>::iterator start;
+    std::vector<u8>::iterator it;
+    std::vector<u8>::iterator start;
 
     char sep = '\n';
     
@@ -88,44 +92,36 @@ std::vector<SNString> SimpleHostSession::extractCommands(std::vector<char> &buf)
         it = std::find(start, buf.end(), sep);
         if(it == buf.end()) {   // Nothing find
             
-            std::vector<char> part = std::vector<char>(start, it);
+            //std::vector<char> part = std::vector<char>(start, it);
             //debugStr = std::string(part.begin(), part.end());
             // std::cout << "debugStr: [" << debugStr << "]\n";
             
             _remainCommandBuf.clear();
-            _remainCommandBuf.insert(_remainCommandBuf.end(), part.begin(), part.end());
+            _remainCommandBuf.insert(_remainCommandBuf.end(), start, buf.end());
             _remainCommandBuf.push_back('\0'); // ken: prevent adding unknow characters
             //_remainCommandBuf.
             
             break;
         }
         
-        std::vector<char> part = std::vector<char>(start, it);
-        part.push_back('\0');   // ken: prevent adding unknow characters
-        //debugStr = std::string(part.begin(), part.end());
-        //std::cout << "debugStr: [" << debugStr << "]\n";
+        // Construct the command
+        std::string newPart(start, it);
+        
+        
+        if(_remainCommandBuf.size() > 0) {
+           //command.append(_remainCommandBuf.data());
+            newPart.append(_remainCommandBuf.begin(), _remainCommandBuf.end());
+           _remainCommandBuf.clear();
+        }
         
         SNString command;
+        command.append(newPart);
+        _outCmds.emplace_back(command);
 
-        // Append the remain buffer first
-        if(_remainCommandBuf.size() > 0) {
-            command.append(_remainCommandBuf.data());
-            _remainCommandBuf.clear();
-        }
-        command.append(part.data());
-        command.append("\0");
-        
-        std::cout << "part.data: [" << part.data() << "] size=" << (part.size()) << "\n";
-        std::cout << "command: [" << command.c_str() << "] \n";
-        result.push_back(command);
-        
-        // Increase the iterator
         start = it+1;
         
         if(start == buf.end()) {
             break;
         }
     }
-    
-    return result;
 }

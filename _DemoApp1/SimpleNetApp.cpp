@@ -326,7 +326,7 @@ void SimpleNetApp::onReceiveCommand(SNString &cmd)
         movePlayer(1, ImVec2(-30, 0));
     } else if(cmd.str() == "right") {
         movePlayer(1, ImVec2(30, 0));
-    } else if(cmd.startsWith("move")){
+    } else if(cmd.startsWith("move")){    
         handleMoveCommand(cmd);
     }
 }

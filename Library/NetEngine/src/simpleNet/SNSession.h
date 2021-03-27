@@ -28,7 +28,7 @@ public:
     
     
     size_t sendData(std::vector<u8> &dataBuf);
-    void sendString(SNString &str);     // ken: is sendString(SNString *str) better??
+    void sendString(const SNString &str);     // ken: is sendString(SNString *str) better??
     void sendString(const char *str);
     
     

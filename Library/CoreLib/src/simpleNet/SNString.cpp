@@ -44,7 +44,7 @@ namespace simpleNet {
     bool SNString::startsWith(const char *prefix) const
     {
         int len = strlen(prefix);
-        return strncmp(_buf.c_str(), prefix, len);
+        return strncmp(_buf.c_str(), prefix, len) == 0;
     }
 
     void SNString::rtrim()
@@ -78,6 +78,17 @@ namespace simpleNet {
         _buf.append(newStr);
     }
     
+//    template <class InputIterator>
+//    void SNString::append(InputIterator first, InputIterator last)
+//    {
+//    //    _buf.append(first, last);
+//    }
+
+    void SNString::append(const std::string &sStr)
+    {
+        _buf.append(sStr);
+    }
+
     void SNString::append(const char *newStr)
     {
         _buf.append(newStr);
@@ -91,7 +102,7 @@ namespace simpleNet {
 
     }
 
-    void SNString::copyTo(std::vector<uint8_t> &outBuf)
+    void SNString::copyTo(std::vector<u8> &outBuf)
     {
         // Reference:
         //  https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar
@@ -100,7 +111,7 @@ namespace simpleNet {
 
     }
     
-    void SNString::appendTo(std::vector<char> &outBuf)
+    void SNString::appendTo(std::vector<u8> &outBuf)
     {
     // Reference:
     //  https://stackoverflow.com/questions/8247793/converting-stdstring-to-stdvectorchar

@@ -61,17 +61,19 @@ bool SNNetBase::checkIncomingData()
 void SNNetBase::queueToOutBuffer(SNString &str)
 {
     if(str.str().size() == 0) {
+        LOG("queueToOutBuffer: input is empty");
         return;
     }
     
-    if(_session != NULL) {
+    if(_session) {
         _session->putBufferWithStr(str);
     }
 }
 
 void SNNetBase::sendDataOut()
 {
-    if(_session == NULL) {
+    if(_session == nullptr) {
+        //LOG("session is null");
         return;
     }
     

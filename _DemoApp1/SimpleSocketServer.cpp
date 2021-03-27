@@ -60,19 +60,19 @@ void SimpleSocketServer::start(int port)
 
         
         
-        //std::cout << "Byte Read: " << ((int) n) << " input: " << buf << "\n";
-        const char *msg = (const char *) buf.data();
-        std::cout << " input: " << msg << "\n";
+        
+        //returnMsg.append(buf.begin(), buf.end());
+        std::string sStr(buf.begin(), buf.end());
+        std::cout << "Byte Read: " << ((int) n) << " input: " << sStr << "\n";
+//        const char *msg = (const char *) buf.data();
+//        std::cout << " input: " << msg << "\n";
 
     //sleep(1);
 
         SNString returnMsg = SNString("ECHO: ");
-        returnMsg.append(msg);
+        returnMsg.append(sStr);
         
-        const char *char_pointer2 = reinterpret_cast<char*>(outBuf.data());
-        
-        //outBuf = "ECHO: ";
-        //returnMsg.copyTo(char_pointer2);
+        returnMsg.copyTo(outBuf);
         
         clientSocket.send(outBuf.data(), outBuf.size());
     }

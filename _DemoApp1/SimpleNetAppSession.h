@@ -23,14 +23,16 @@ public:
     bool isHost;
     
     SimpleHostSession(SNSocket *);
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
-    virtual void onConnect();
-    virtual void onDisconnect();
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
+    virtual void onDisconnect() override;
     
-    std::vector<SNString> extractCommands(std::vector<char> &buf);
+    void extractCommands(
+                std::vector<u8> &buf, std::vector<SNString> &commands);
     //std::vector<SNString> extractCommands(std::vector<char> &buf);
 private:
-    std::vector<char> _remainCommandBuf;    // ken: store the incomplete command 
+    std::vector<char> _remainCommandBuf;    // ken: store the incomplete command
+    std::vector<SNString> _cmdList;
 };
 
 

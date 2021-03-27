@@ -16,6 +16,64 @@
 using namespace simpleNet;
 using namespace std;
 
+void testSimpleSession()
+{
+    SNSocketAddr addr;
+    addr.setIPv4(127, 0, 0, 1);
+    addr.setPort(8888);
+    //addr.setPort(5433);
+    
+    SNSocket socket;
+    socket.createTCP();
+    socket.connect(addr);
+    
+    TestHttpGetSession session(std::move(socket));
+    
+    cout << "Local Socket\n";
+    socket.printInfo();
+    
+    session.setConnected(false);
+    bool didSend = false;
+    for(int i=0; i<1000; i++) {
+        size_t nRead = 0;
+        if(session.isConncting(nRead) == false) {  // check for data
+            //std::cout << "Nothing received\n";
+            //sleep(1);
+            break;
+        }
+
+        // log("Checking receive data");
+        session.receiveData();
+        sleep(1);
+    }
+    
+    
+    //session.
+    //SNSess
+    
+}
+
+void testCopySocket()
+{
+    
+    SNSocket sock;
+    sock.mockConnect();
+    sock.printInfo();
+    
+    //unique_ptr<SNSocket> sockPtr = make_unique<SNSocket>(sock);
+    SNSocket newSock(std::move(sock));
+    
+    cout << "Old Socket\n";
+    sock.printInfo();
+    
+    cout << "New Socket\n";
+    newSock.printInfo();
+    
+    std::string value;
+    cin >> value;
+    // sock.connect(addr);
+    
+}
 
 void testStr()
 {
@@ -47,7 +105,8 @@ void testExtractCommands() {
         "4\ncmd5\n",
     };
     
-    SimpleHostSession session = SimpleHostSession(nullptr);
+    SNSocket sock;
+    SimpleHostSession session(std::move(sock));
     std::vector<SNString> result;
     
     for(int i=0; i<3; i++) {
@@ -212,9 +271,9 @@ void testSampleClientSession()
 {
     
     SNClient client = simpleNet::SNClient();
+    SampleNetSessionFactory factory(false);
     
-    
-    client.setSessionFactory(new SampleNetSessionFactory(false));
+    client.setSessionFactory(make_shared<SampleNetSessionFactory>(&factory));
     
     SNSocketAddr addr;
     addr.setIPv4(127, 0, 0, 1);
@@ -255,9 +314,9 @@ void testSampleHostSession()
 {
     
     SNHost host = simpleNet::SNHost();
+    //SampleNetSessionFactory factory(true);
     
-    
-    host.setSessionFactory(new SampleNetSessionFactory(true));
+    host.setSessionFactory(make_shared<SampleNetSessionFactory>(true));
     
     
     bool isSuccess = host.bindPort(5433);
@@ -299,14 +358,18 @@ void testClientWithSession() {
     sock.createTCP();
     SNSocketAddr addr;
     addr.setIPv4(127, 0, 0, 1);
-    addr.setPort(2345);
+    addr.setPort(5433);
 
     sock.connect(addr);
     
     auto factory = TestEchoClientSessionFactory();
-    SNSession *session = factory.create(&sock);
+    unique_ptr<SNSession> session = factory.newSession(std::move(sock));
+    
+    cout << "info of old sock\n";
+    sock.printInfo();
 
     session->setConnected(/* isHost */ false);
+    
     
     
 //    sock.send_c_str("GET /index.html HTTP/1.1\r\n"
@@ -480,7 +543,7 @@ void testNonBlockingServer() {
     // setNonblock(clientSocket.getSockFd());
     std::cout << "Client success to accept\n";
     
-    SNSession *session = factory.create(&clientSocket);
+    auto session = factory.newSession(std::move(clientSocket));
         
     std::vector<char> buf;
     std::vector<char> outBuf;
@@ -531,15 +594,16 @@ void testRebindSocket() {
     }
     std::cout << "Client success to accept\n";
     
-    SNSession *session = factory.create(&clientSocket);
+    SNEchoSession session(std::move(clientSocket));
+    //auto session = factory.create(&clientSocket);
         
     std::vector<char> buf;
     std::vector<char> outBuf;
     for(;;) {
-        if(session->isAlive() == false) {
+        if(session.isAlive() == false) {
             break;
         }
-        session->receiveData();  // ken: sleep inside if no data received
+        session.receiveData();  // ken: sleep inside if no data received
     }
     
     
@@ -572,15 +636,15 @@ void testEchoServer() {
     }
     std::cout << "Client success to accept\n";
     
-    SNSession *session = factory.create(&clientSocket);
+    auto session = SNEchoSession(std::move(clientSocket));
         
     std::vector<char> buf;
     std::vector<char> outBuf;
     for(;;) {
-        if(session->isAlive() == false) {
+        if(session.isAlive() == false) {
             break;
         }
-        session->receiveData();  // ken: sleep inside if no data received
+        session.receiveData();  // ken: sleep inside if no data received
     }
     
     
@@ -614,7 +678,7 @@ void testServerUsingSession() {
     }
     std::cout << "Client success to accept\n";
     
-    SNEchoSession session = SNEchoSession(&clientSocket);
+    SNEchoSession session = SNEchoSession(std::move(clientSocket));
         
     std::vector<char> buf;
     std::vector<char> outBuf;
@@ -783,6 +847,9 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
+    // testSimpleSession();
+    // testCopySocket();
+    
     // testStr();
     // testCin();
     // testIMGUI();             // ken: not ready
@@ -794,8 +861,8 @@ void runSingleTest() {
     // testTrimStr();
     //testSplitStr();
     //testExtractCommands();
-    //testSampleClientSession();
-    testSampleHostSession();
+    testSampleClientSession();
+    //testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();

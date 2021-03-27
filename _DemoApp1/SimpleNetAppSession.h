@@ -19,17 +19,19 @@ class SimpleNetApp;
 
 class SimpleHostSession : public SNSession {
 public:
-    SimpleNetApp *app;
+    std::shared_ptr<SimpleNetApp> app;
     bool isHost;
     
-    SimpleHostSession(SNSocket *);
+    SimpleHostSession(SNSocket &&);
+    ~SimpleHostSession();
+    
     virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
     virtual void onConnect() override;
     virtual void onDisconnect() override;
     
     void extractCommands(
                 std::vector<u8> &buf, std::vector<SNString> &commands);
-    //std::vector<SNString> extractCommands(std::vector<char> &buf);
+    
 private:
     std::vector<char> _remainCommandBuf;    // ken: store the incomplete command
     std::vector<SNString> _cmdList;
@@ -38,28 +40,21 @@ private:
 
 class SimpleSessionFactory : public SNSessionFactory {
 public:
-    SimpleSessionFactory(SimpleNetApp *app, bool isHost) : SNSessionFactory() {
+    SimpleSessionFactory(std::shared_ptr<SimpleNetApp> app, bool isHost) : SNSessionFactory() {
         _isHost = isHost;
         _app = app;
     }
     
-    virtual SNSession *create(SNSocket *socket) {
-        SimpleHostSession *session = new SimpleHostSession(socket);
-        
-        //session->isHost = _isHost;
-        session->app = _app;
-        session->isHost = _isHost;
-        
-        return session;
-//        if(_isHost) {
-//            return new SampleNetSession(socket);
-//        } else {
-//            return new SampleNetClientSession(socket);
-//        }
+    virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) override {        
+        auto ptr = std::make_unique<SimpleHostSession>(std::move(socket));
+        ptr->app = _app;
+        ptr->isHost = _isHost;
+        return ptr;
     }
+   
 private:
     bool _isHost;
-    SimpleNetApp *_app;
+    std::shared_ptr<SimpleNetApp> _app;
 
 };
 

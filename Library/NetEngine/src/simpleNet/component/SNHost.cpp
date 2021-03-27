@@ -24,10 +24,10 @@ bool SNHost::bindPort(int port)
 {
     _port = port;
     
-    if(_factory == NULL) {
-        std::cout << "SNHost: sessionFactory undefined\n";
-        return false;
-    }
+//    if(_factory == NULL) {
+//        std::cout << "SNHost: sessionFactory undefined\n";
+//        return false;
+//    }
     
     //
     // Get the socket reference
@@ -77,14 +77,13 @@ void SNHost::initClientSocket()
 
 bool SNHost::attemptAccept()
 {
-    if(_serverSocket == NULL) {
+    if(_serverSocket == nullptr) {
         ERROR_LOG("attemptAccept: fail: socket is NULL");
         throw SNError("attemptAccept fail: socket not ready");
     }
-    initClientSocket();
-    //SNSocket sock = *_clientSocket;     // ken: HACK: is it okay?
     
-    SNSocketAcceptStatus status = _serverSocket->attempAccept(*_mainSocket);
+    SNSocket newSock;
+    SNSocketAcceptStatus status = _serverSocket->attempAccept(newSock);
     if(status == SNSocketAcceptStatus::Fail) {
         throw SNError("attemptAccept fail");
     }
@@ -93,13 +92,59 @@ bool SNHost::attemptAccept()
         return false;
     }
     
-    // Create the Socket
-    _mainSocket->setNonBlock(true);
-    _session = _factory->create(_mainSocket);
-    _session->setConnected(/* isHost */ true);
+    newSock.setNonBlock(true);
+    if(createMainSession(std::move(newSock)) == false) {
+        ERROR_LOG("Fail to create main session");
+        return false;
+    }
+    _mainSession->setConnected(/* isHost */ true);
     
+    //initClientSocket();
+    //SNSocket sock = *_clientSocket;     // ken: HACK: is it okay?
+//
+//    SNSocketAcceptStatus status = _serverSocket->attempAccept(*_mainSocket);
+//    if(status == SNSocketAcceptStatus::Fail) {
+//        throw SNError("attemptAccept fail");
+//    }
+//
+//    if(status == SNSocketAcceptStatus::Pending) {
+//        return false;
+//    }
+//
+//    // Create the Socket
+//    _mainSocket->setNonBlock(true);
+//    _session = _factory->create(_mainSocket);
+//    _session->setConnected(/* isHost */ true);
+//
     return true;
 }
+
+//
+//bool SNHost::attemptAcceptOld()
+//{
+//    if(_serverSocket == NULL) {
+//        ERROR_LOG("attemptAccept: fail: socket is NULL");
+//        throw SNError("attemptAccept fail: socket not ready");
+//    }
+//    initClientSocket();
+//    //SNSocket sock = *_clientSocket;     // ken: HACK: is it okay?
+//
+//    SNSocketAcceptStatus status = _serverSocket->attempAccept(*_mainSocket);
+//    if(status == SNSocketAcceptStatus::Fail) {
+//        throw SNError("attemptAccept fail");
+//    }
+//
+//    if(status == SNSocketAcceptStatus::Pending) {
+//        return false;
+//    }
+//
+//    // Create the Socket
+//    _mainSocket->setNonBlock(true);
+//    _session = _factory->create(_mainSocket);
+//    _session->setConnected(/* isHost */ true);
+//
+//    return true;
+//}
 
 //SNHostStatetIdle,
 //SNHostStatetWaitForClient,            // after bindPort and before accept

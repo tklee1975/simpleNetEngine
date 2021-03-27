@@ -8,10 +8,20 @@
 #include "SimpleNetAppSession.h"
 #include "SimpleNetApp.h"
 
-SimpleHostSession::SimpleHostSession(SNSocket *sock) : SNSession(sock)
+
+SimpleHostSession::SimpleHostSession(SNSocket &&_sock)
+    : SNSession(std::move(_sock))
 {
     
 }
+
+SimpleHostSession::~SimpleHostSession()
+{
+    if(app) {
+        app.reset();
+    }
+}
+
 
 void SimpleHostSession::onConnect()
 {
@@ -47,30 +57,6 @@ void SimpleHostSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
         app->onReceiveCommand(_cmdList[i]);
     }
     
-    
-//    const char *msg = (const char *) buf.data();
-//    std::cout << "RECEIVE: " << msg << "\n";
-//    if(strlen(msg) == 0) {
-//        return;
-//    }
-//
-//    //
-//    SNString cmd;
-//    if(msg[0] == 'u'){
-//        cmd.set("up");
-//    } else if(msg[0] == 'd') {
-//        cmd.set("down");
-//    } else if(msg[0] == 'l') {
-//        cmd.set("left");
-//    } else if(msg[0] == 'r') {
-//        cmd.set("right");
-//    } else {
-//        cmd = SNString(msg);
-//    }
-//
-//    if(cmd.isEmpty() == false) {
-//        app->onReceiveCommand(cmd);
-//    }
 }
 
 

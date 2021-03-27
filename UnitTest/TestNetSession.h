@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <simpleNet/NetEngine.h>
+#include <simpleNet/CoreLib.h>
 
 using namespace simpleNet;
 
@@ -17,19 +18,37 @@ using namespace simpleNet;
 
 
 
+class TestHttpGetSession : public SNSession
+{
+public:
+    TestHttpGetSession(SNSocket &&);
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
+};
+
+
 class TestEchoClientSession : public SNSession {
 public:
     TestEchoClientSession(SNSocket *);
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
-    virtual void onConnect();
+    TestEchoClientSession(SNSocket &&);
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
 };
 
 class TestEchoClientSessionFactory : public SNSessionFactory {
 public:
    
-    virtual SNSession *create(SNSocket *socket) {
-        return new TestEchoClientSession(socket);
+//    virtual SNSession *create(SNSocket *socket) override {
+//        return new TestEchoClientSession(socket);
+//    }
+//    
+    
+    
+    virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) override {
+        
+        return std::make_unique<TestEchoClientSession>(std::move(socket));
     }
+    
 };
 
 
@@ -38,23 +57,27 @@ public:
 
 
 
-class SampleNetSession : public SNSession {
+class SampleNetSession : public SNSession
+{
 public:
-    SampleNetSession(SNSocket *);
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
-    virtual void onConnect();
-    virtual void onDisconnect();
+    SampleNetSession(SNSocket &&sock);
+    
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
+    virtual void onDisconnect() override;
     
 private:
     int _counter;
 };
 
-class SampleNetClientSession : public SNSession {
+class SampleNetClientSession : public SNSession
+{
 public:
-    SampleNetClientSession(SNSocket *);
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
-    virtual void onConnect();
-    virtual void onDisconnect();
+    SampleNetClientSession(SNSocket &&);
+    
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
+    virtual void onDisconnect() override;
     
 private:
     int _counter;
@@ -66,13 +89,14 @@ public:
         _isHost = isHost;
     }
     
-    virtual SNSession *create(SNSocket *socket) {
+    virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) override {
         if(_isHost) {
-            return new SampleNetSession(socket);
+            return std::make_unique<SampleNetSession>(std::move(socket));
         } else {
-            return new SampleNetClientSession(socket);
+            return std::make_unique<SampleNetClientSession>(std::move(socket));
         }
     }
+
 private:
     bool _isHost;
 

@@ -9,7 +9,9 @@
 #include "../SNSessionFactory.h"
 #include "../SNSocket.h"
 #include <iostream>
+#include <memory>
 
+using namespace std;
 
 namespace simpleNet {
 
@@ -18,33 +20,43 @@ SNClient::SNClient() : SNNetBase()
 {
     _state = SNClientStateIdle;
 }
-//    
-//void SNClient::setSessionFactory(SNSessionFactory *factory)
-//{
-//    _factory = factory;
-//}
 
 bool SNClient::connectServer(const SNSocketAddr &addr)
 {
-    if(_factory == NULL) {
-        std::cout << "SNClient: sessionFactory undefined\n";
-        return false;
-    }
+//    if(_factory == nullptr) {
+//        std::cout << "SNClient: sessionFactory undefined\n";
+//        return false;
+//    }
+//    
+    SNSocket newSock;
     
-    //
-    // Get the socket reference
-    initSocket();
+    newSock.createTCP();
+    newSock.connect(addr);
+    newSock.setNonBlock(true);
     
+    createMainSession(std::move(newSock));
+    _mainSession->setConnected(/* isHost */ false);
     
-    _mainSocket->connect(addr);
-    _mainSocket->setNonBlock(true);
-    // Create the TCP
-    
-    
-    
-    _session = _factory->create(_mainSocket);
-    _session->setConnected(/* isHost */ false);
-    
+//    
+//    
+//    //
+//    // Get the socket reference
+//    initSocket();
+//    
+//    
+//    _mainSocket->connect(addr);
+//    _mainSocket->setNonBlock(true);
+//    // Create the TCP
+//    
+//    
+//    SNSocket socket;
+//    socket.connect(addr);
+//    socket.setNonBlock(true);
+//    //auto socketPtr = make_unique<SNSocket>(&socket);
+//    
+//    //_session = _factory->create(socketPtr);
+//    _session->setConnected(/* isHost */ false);
+//    
     _state = SNClientStatetConnected;
     
     return true;

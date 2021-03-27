@@ -9,12 +9,25 @@
 #include "SimpleNetAppSession.h"
 
 #include <iostream>
+#include <memory>
+
+using namespace std;
+using namespace simpleNet;
 
 const int kPort = 4567;
 
-SimpleNetApp::SimpleNetApp(){
-    _host = SNHost();
-    _client = SNClient();
+SimpleNetApp::SimpleNetApp()
+{
+    shared_ptr<SimpleNetApp> thisPtr(this);
+//
+//    _clientFactory(thisPtr, false);
+    //auto myPtr = std::make_shared<SimpleNetApp>(this);
+    //shared_ptr<SimpleSessionFactory> hostPtr(this);
+    //auto hostFactoryPtr
+    //auto thisPtr = this;
+    
+    _host.setSessionFactory(make_shared<SimpleSessionFactory>(thisPtr, true));
+    _client.setSessionFactory(make_shared<SimpleSessionFactory>(thisPtr, false));
     
     _errorMsg = SNString("");
 }
@@ -51,21 +64,7 @@ void SimpleNetApp::onUpdate(double delta)
     } else if(SimpleNetAppStateConnected == _state) {
         onUpdateConnected(delta);
     }
-//
-//    // GUI Handling
-//    // A new window
-//    ImGui::Begin("Testing Primitive!"); // Create a window called "Hello, world!" and append into it.
-//
-//
-//    if (ImGui::Button("Button A")) {
-//        std::cout << "'Button A' is clicked\n";
-//    }
-//    ImGui::Text("Text Line 1");
-//    ImGui::Text("Text Line 2");
-//    ImGui::Text("Text Line with variable %s", "hello");
-//    ImGui::End();
-//
-    // END of GUI Handling
+
     drawGui();
     
     drawShapes();
@@ -98,15 +97,11 @@ void SimpleNetApp::onCreateRoomClicked()
     }
     
     _state = SimpleNetAppStateWaitClient;
-    //setupHost();
-    //_state = SimpleNetAppStateCreateHost; // SimpleNetAppStateWaitClient;
 }
 
 void SimpleNetApp::onStartRoomClicked()
 {
-    //setupHost();
     _state = SimpleNetAppStateCreateHost;
-    //_state = SimpleNetAppStateWaitClient;
 }
 
 void SimpleNetApp::onJoinHostClicked()
@@ -164,11 +159,6 @@ void SimpleNetApp::drawGuiCreateHost()
         _port = port;
         
         onCreateRoomClicked();
-//        SNString str = SNString(address);
-//        if(setupSockAddress(str, port)) {
-//            onJoinHostClicked();
-//            return;
-//        }
     }
     
 }
@@ -279,8 +269,6 @@ void SimpleNetApp::handleInput(double deltaTime)
 
 void SimpleNetApp::setupHost()
 {
-    auto factory = new SimpleSessionFactory(this, true);
-    _host.setSessionFactory(factory);
     bool isSuccess = _host.bindPort(_port);
     
     if(isSuccess == false) {
@@ -295,8 +283,6 @@ void SimpleNetApp::setupHost()
 
 void SimpleNetApp::setupClient()
 {
-    _client.setSessionFactory(new SimpleSessionFactory(this, false));
-    
     _isHost = false;
     
     try {
@@ -397,19 +383,8 @@ void SimpleNetApp::sendMoveCommand(int deltaX, int deltaY)
 void SimpleNetApp::sendCommand(SNString &cmd)
 {
     if(_isHost) {
-        if(_host.getSession() == NULL) {
-            LOG("SimpleNetApp.sendCommand: host.session not ready");
-            return;
-        }
-        
-        //_host.getSession()->sendString(cmd);
         _host.queueToOutBuffer(cmd);
     } else {
-        if(_client.getSession() == NULL) {
-            LOG("SimpleNetApp.sendCommand: client.session not ready");
-            return;
-        }
         _client.queueToOutBuffer(cmd);
-        //_client.getSession()->sendString(cmd);
     }
 }

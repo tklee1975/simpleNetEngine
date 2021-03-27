@@ -18,6 +18,16 @@ SNSession::SNSession(SNSocket *socket)
     _isAlive = _socket == nullptr ? false : true;
 }
 
+SNSession::SNSession(SNSocket &&socket)
+:_mySocket(std::move(socket))
+//:_mySocket(socket)
+{
+    _isAlive = true; // _mySocket.;
+    std::cout << "SNSession: move constructor\n";
+    _mySocket.printInfo();
+}
+
+
 SNSession::~SNSession()
 {
     if(_socket != nullptr)
@@ -25,6 +35,7 @@ SNSession::~SNSession()
         _socket->close();
         _socket = nullptr;
     }
+    _mySocket.close();
 }
     
 void SNSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
@@ -33,23 +44,28 @@ void SNSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
     std::cout << "onRecvData: " << nRead << " bytes received\n";
 }
 
-size_t SNSession::sendData(std::vector<u8> &dataBuf)
+int SNSession::sendData(std::vector<u8> &dataBuf)
 {
-    if(!_socket) {
-        return 0;
-    }
+    int result = _mySocket.send(dataBuf.data(), dataBuf.size());
+    LOG("sendData: result=%d", result);
     
-    
-    return _socket->send(dataBuf.data(), dataBuf.size());
+    return result;
+//    if(!_socket) {
+//        return 0;
+//    }
+//
+//
+//    return _socket->send(dataBuf.data(), dataBuf.size());
 }
 
 size_t SNSession::availableBytesToRead()
 {
-    if(!_socket) {
-        return 0;
-    }
-    
-    return _socket->availableBytesToRead();
+    return _mySocket.availableBytesToRead();
+//    if(!_socket) {
+//        return 0;
+//    }
+//
+//    return _socket->availableBytesToRead();
 }
 
 void SNSession::setConnected(bool isHostFlag)
@@ -62,15 +78,17 @@ void SNSession::receiveData() {
     size_t nRead = availableBytesToRead();
     // log("SNSession.receiveData: nRead=%d", nRead);
     if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
+        //std::cout << "Nothing received\n";
         //sleep(1);       // 1 second     //
         return;
     }
     
-    if(!_socket) {
-        return;
-    }
-    
-    _socket->recv(_inBuffer, nRead);
+//    if(!_socket) {
+//        return;
+//    }
+//
+    //_socket->recv(_inBuffer, nRead);
+    _mySocket.recv(_inBuffer, nRead);
     _inBuffer.push_back(0);   // add the character '\0' to make it a string
 
     std::string strValue = std::string(_inBuffer.begin(), _inBuffer.end());
@@ -85,6 +103,7 @@ void SNSession::close() {
     if(! _socket) {
         _socket->close();
     }
+    _mySocket.close();
 }
 
 bool SNSession::isConncting(size_t &availableByte)
@@ -140,12 +159,9 @@ void SNSession::putBufferWithStr(SNString &str)
     // str.app
 }
 
-void SNSession::sendString(const SNString &str)
+void SNSession::sendString(SNString &str)
 {
-    // ken: TODO: Add a queue to prevent buffer ov
-
-    
-   // str.copyTo(_outBuffer);     // the outBuffer is clear here...!!!
+    str.copyTo(_outBuffer);     // the outBuffer is clear here...!!!
     
     // Reference here!!!
     sendData(_outBuffer);

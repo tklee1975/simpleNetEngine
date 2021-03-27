@@ -15,19 +15,26 @@
 
 namespace simpleNet {
     
-void SNRequestServer::setSessionFactory(SNSessionFactory *factory)
+//void SNRequestServer::setSessionFactory(SNSessionFactory *factory)
+//{
+//    LOG("Setting Session Factory OLD");
+//    _factory = factory;
+//}
+
+void SNRequestServer::setSessionFactory(std::shared_ptr<SNSessionFactory> factory)
 {
-    _factory = factory;
+    LOG("Setting Session Factory");
+    _factoryPtr = factory;
 }
 
 void SNRequestServer::start(int port)
 {
     _port = port;
     
-    if(_factory == NULL) {
-        std::cout << "RequestServer: sessionFactory undefined\n";
-        return;
-    }
+//    if(_factory == NULL) {
+//        std::cout << "RequestServer: sessionFactory undefined\n";
+//        return;
+//    }
     
     //
     SNSocketAddr addr;
@@ -57,18 +64,26 @@ void SNRequestServer::start(int port)
     
     std::cout << "Client success to accept\n";
     
-    SNSession *session = _factory->create(&clientSocket);
-    session->setConnected(/* isHost */ true); 
-
-    std::vector<char> buf;
-    std::vector<char> outBuf;
-    for(;;) {
-        if(session->isAlive() == false) {
-            break;
-        }
-        session->receiveData();  // ken: sleep inside if no data received
+    if(_factoryPtr == nullptr) {
+        ERROR_LOG("RequestServer: _factoryPtr is null");
+        return;
     }
     
+    
+    auto session = _factoryPtr->newSession(std::move(clientSocket));
+    if(session == nullptr) {
+        ERROR_LOG("RequestServer: session is null");
+        return;
+    }
+    session->setConnected(true);    //
+    
+    for(;;) {
+       if(session->isAlive() == false) {
+           break;
+       }
+       session->receiveData();  // ken: sleep inside if no data received
+   }
+
     
     serverSocket.close();
 }

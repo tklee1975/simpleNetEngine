@@ -12,8 +12,10 @@
 #include <simpleNet/CoreLib.h>
 #include <simpleNet/NetEngine.h>
 #include <ImguiHelper.h>
+#include "SimpleNetAppSession.h"
 
 using namespace simpleNet;
+
 
 enum SimpleNetAppState {
     SimpleNetAppStateIdle = 0,
@@ -49,6 +51,9 @@ private:
     
     int _cmdCounter;
     
+//    SimpleSessionFactory _hostFactory;
+//    SimpleSessionFactory _clientFactory;
+//    
     // --- internal Methods
     
     

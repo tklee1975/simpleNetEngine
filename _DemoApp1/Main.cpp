@@ -27,9 +27,10 @@ void startSocketServer() {
 
 void startEchoServer() {
     auto server = simpleNet::SNRequestServer();
-    auto sessionFactory = new simpleNet::SNEchoSessionFactory();
+    //auto sessionFactory = new simpleNet::SNEchoSessionFactory();
+    //SNEchoSessionFactory factory;
     
-    server.setSessionFactory(sessionFactory);
+    server.setSessionFactory(std::make_shared<SNEchoSessionFactory>());
     server.start(2345);
 }
 

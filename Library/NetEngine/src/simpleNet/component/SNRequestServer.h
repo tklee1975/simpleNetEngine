@@ -9,6 +9,7 @@
 #define SNRequestServer_h
 
 #include <stdio.h>
+#include <memory>
 
 namespace simpleNet {
 
@@ -16,11 +17,15 @@ class SNSessionFactory;
 
 class SNRequestServer {
 public:
-    void setSessionFactory(SNSessionFactory *factory);
+    // void setSessionFactory(SNSessionFactory *factory);
+    
+    void setSessionFactory(std::shared_ptr<SNSessionFactory> factory);
+    
     void start(int port);
     
 private:
     SNSessionFactory* _factory = NULL;
+    std::shared_ptr<SNSessionFactory> _factoryPtr;
     int _port = 0;
 };
 

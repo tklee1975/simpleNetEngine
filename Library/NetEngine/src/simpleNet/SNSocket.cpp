@@ -81,6 +81,14 @@ SNSocket::SNSocket()
     _enableReuseAddress = false;
 }
 
+SNSocket::SNSocket(SNSocket &&other)
+: _sock(other._sock)
+{
+    // Copy
+    std::cout << "Move Constructor is called\n";
+    other._sock = INVALID_SOCKET;
+}
+
 int SNSocket::getSockFd()
 {
     return _sock;
@@ -119,6 +127,7 @@ void SNSocket::close()
             ::close(_sock);
         #endif
         _sock = INVALID_SOCKET;
+        std::cout << "Socket is closed\n";
     }
 }
 
@@ -251,6 +260,7 @@ int SNSocket::send(const u8* data, size_t dataSize)
         std::cout << "Fail to send " << ret << "\n";
         return -1;
     }
+    //std::cout << "DataSize: " << dataSize << "\n";
     
     return ret; 
 }
@@ -300,6 +310,13 @@ void SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
 
 }
 
+void SNSocket::mockConnect()
+{
+    _sock = 100;
+}
 
-
+void SNSocket::printInfo()
+{
+    std::cout << "info: " << _sock << "\n";
+}
 }

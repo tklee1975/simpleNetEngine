@@ -25,6 +25,8 @@ inline void sleep(int sec) {
 #endif
 }
 
+// Helper Macro
+
 // Common class
 
 class SNError : public std::exception {

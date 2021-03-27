@@ -16,18 +16,18 @@ namespace simpleNet {
     
 class SNEchoSession : public SNSession {
 public:
-    SNEchoSession(SNSocket *);
+    SNEchoSession(SNSocket &&sock);
     
 protected:
-    virtual void onRecvData(std::vector<char> &buf, size_t &nRead);
-    virtual void onConnect();
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) override;
+    virtual void onConnect() override;
 };
 
 class SNEchoSessionFactory : public SNSessionFactory {
 public:
-    virtual SNSession *create(SNSocket *socket) {
-        return new SNEchoSession(socket);
-    }
+    virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) override {
+        return std::make_unique<SNEchoSession>(std::move(socket));
+    }    
 };
 
 }

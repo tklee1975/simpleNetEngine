@@ -61,11 +61,12 @@ public:
 #endif
 
     SNSocket();
+    SNSocket(SNSocket &&other); // move constructor
+
     
     // Constructor & Destructor
     ~SNSocket() {
         close();
-        
     }
 
     void createUDP();
@@ -88,6 +89,9 @@ public:
     // Options
     void setNonBlock(bool isNonBlack);
     void setReuseAddress(bool enableReuse);
+    
+    void mockConnect();
+    void printInfo();
     
 private:
     SOCKET _sock = INVALID_SOCKET;

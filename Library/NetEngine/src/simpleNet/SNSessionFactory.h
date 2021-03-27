@@ -9,16 +9,23 @@
 #define SNSessionFactory_h
 
 #include <stdio.h>
+#include <memory>
 #include "SNSession.h"
 #include "SNSocket.h"
 
 namespace simpleNet {
     
 
-class SNSessionFactory {
+class SNSessionFactory
+{
 public:
     SNSessionFactory() {} 
-    virtual SNSession *create(SNSocket *socket) = 0;
+//    virtual SNSession *create(SNSocket *socket) {
+//        return nullptr;
+//    }
+    virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) {
+        return nullptr;
+    }
 };
 
 }

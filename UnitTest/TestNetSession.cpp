@@ -9,7 +9,50 @@
 
 using namespace simpleNet;
 
+TestHttpGetSession::TestHttpGetSession(SNSocket &&sock)
+    : SNSession(std::move(sock))
+{
+    
+}
+
+void TestHttpGetSession::onConnect()
+{
+    std::cout << "Session Connected\n";
+    
+    char command[] = "GET /index.html \r\n\r\n";
+    //_mySocket.send(command, strlen(command));
+    sendString(command);
+    //flushBuffer();
+}
+
+void TestHttpGetSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
+{
+    buf[nRead] = '\0';
+    const char *msg = (const char *) buf.data();
+    std::cout << "REPLY FROM Server:\n" << msg << "\n";
+    
+    //std::cout << "Please enter something to send\n";
+    //std::string input;
+    
+    //std::cin >> input;
+    
+    //SNString returnStr = SNString(input.c_str());
+    
+    //sendString(returnStr);
+}
+
+
+// --------------- 
+
 TestEchoClientSession::TestEchoClientSession(SNSocket *sock) : SNSession(sock)
+{
+    
+}
+
+
+//TestEchoClientSession(SNSocket &&);
+TestEchoClientSession::TestEchoClientSession(SNSocket &&sock)
+    : SNSession(std::move(sock))
 {
     
 }
@@ -18,7 +61,7 @@ void TestEchoClientSession::onConnect()
 {
 }
 
-void TestEchoClientSession::onRecvData(std::vector<char> &buf, size_t &nRead)
+void TestEchoClientSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 {
     buf[nRead] = '\0';
     const char *msg = (const char *) buf.data();
@@ -37,12 +80,18 @@ void TestEchoClientSession::onRecvData(std::vector<char> &buf, size_t &nRead)
 
 // --------------- 
 
-
-SampleNetSession::SampleNetSession(SNSocket *sock) : SNSession(sock)
+SampleNetSession::SampleNetSession(SNSocket &&sock)
+    : SNSession(std::move(sock))
 {
     _counter = 0;
-
 }
+
+//
+//SampleNetSession::SampleNetSession(SNSocket *sock) : SNSession(sock)
+//{
+//    _counter = 0;
+//
+//}
 
 void SampleNetSession::onConnect()
 {
@@ -55,7 +104,7 @@ void SampleNetSession::onDisconnect()
     std::cout << "Client disconnected\n";
 }
 
-void SampleNetSession::onRecvData(std::vector<char> &buf, size_t &nRead)
+void SampleNetSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 {
     if(nRead == 0) {
         return;
@@ -67,12 +116,12 @@ void SampleNetSession::onRecvData(std::vector<char> &buf, size_t &nRead)
 
 
 
-
-SampleNetClientSession::SampleNetClientSession(SNSocket *sock) : SNSession(sock)
+SampleNetClientSession::SampleNetClientSession(SNSocket &&sock)
+    : SNSession(std::move(sock))
 {
     _counter = 0;
-
 }
+
 
 void SampleNetClientSession::onConnect()
 {
@@ -85,7 +134,7 @@ void SampleNetClientSession::onDisconnect()
     std::cout << "Client disconnected\n";
 }
 
-void SampleNetClientSession::onRecvData(std::vector<char> &buf, size_t &nRead)
+void SampleNetClientSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 {
     if(nRead == 0) {
         return;

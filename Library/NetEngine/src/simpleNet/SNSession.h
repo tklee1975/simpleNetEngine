@@ -20,15 +20,17 @@ namespace simpleNet {
 class SNSession {
 public:
     SNSession(SNSocket *socket);
-    ~SNSession();
+    SNSession(SNSocket &&socket);
+    virtual ~SNSession();           // ken: why need virtual??
 
+    SNSocket _mySocket;
     SNSocket *_socket = nullptr;      // ken: the socketing connecting the client or server
     bool isHost;           
     
     
     
-    size_t sendData(std::vector<u8> &dataBuf);
-    void sendString(const SNString &str);     // ken: is sendString(SNString *str) better??
+    int sendData(std::vector<u8> &dataBuf);
+    void sendString(SNString &str);     // ken: is sendString(SNString *str) better??
     void sendString(const char *str);
     
     
@@ -45,7 +47,7 @@ public:
 protected:  // implemented by the subclass
     virtual void onConnect() = 0;
     virtual void onDisconnect() {}
-    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead); // ken: use & reference to save copy
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) = 0; // ken: use & reference to save copy
     
 private:
     std::vector<u8> _outBuffer;

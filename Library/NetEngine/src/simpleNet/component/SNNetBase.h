@@ -2,6 +2,7 @@
 #define SNNetBase_hpp
 
 #include <stdio.h>
+#include <memory>
 
 namespace simpleNet {
 
@@ -16,7 +17,8 @@ class SNString;
 class SNNetBase {
 public:
     SNNetBase();
-    void setSessionFactory(SNSessionFactory *factory);
+    virtual ~SNNetBase() {} 
+    void setSessionFactory(std::shared_ptr<SNSessionFactory> factory);
     
     SNSession *getSession();        // ken: ???: should use const SNSession?
     void sendDataOut();
@@ -25,13 +27,14 @@ public:
     
 
 protected:
-    SNSessionFactory* _factory = NULL;
-    SNSession *_session = NULL;         // connected session
-    SNSocket *_mainSocket = NULL;           // connected socket
+    std::shared_ptr<SNSessionFactory> _factory;
     
     void initSocket();
     
+    std::unique_ptr<SNSession> _mainSession = nullptr;
     
+    
+    bool createMainSession(SNSocket &&_sock);
 };
 
 }

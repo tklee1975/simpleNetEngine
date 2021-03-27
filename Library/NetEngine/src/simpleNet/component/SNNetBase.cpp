@@ -12,47 +12,59 @@ SNNetBase::SNNetBase()
 {
 }
     
-void SNNetBase::setSessionFactory(SNSessionFactory *factory)
+void SNNetBase::setSessionFactory(std::shared_ptr<SNSessionFactory> factory)
 {
     _factory = factory;
 }
 
 SNSession *SNNetBase::getSession()
 {
-    return _session;
+    return nullptr;// _session; // ken: not use
 }
 
 
 void SNNetBase::initSocket()
 {
     // release current
-    if(_mainSocket) {
-        delete _mainSocket;
-        _mainSocket = NULL;
+//    if(_mainSocket) {
+//        delete _mainSocket;
+//        _mainSocket = NULL;
+//    }
+//    
+//    
+//    // ken: FIXME: Clear the previous connection
+//    _mainSocket = new SNSocket();
+//    _mainSocket->createTCP();
+//    
+}
+
+bool SNNetBase::createMainSession(SNSocket &&_sock)
+{
+    if(_factory == nullptr) {
+        ERROR_LOG("createMainSession: factory is null");
+        return false;
     }
     
+    _mainSession = _factory->newSession(std::move(_sock));
     
-    // ken: FIXME: Clear the previous connection
-    _mainSocket = new SNSocket();
-    _mainSocket->createTCP();
-    //_clientSocket->setNonBlock(true);
+    return _mainSession != nullptr;
 }
 
 bool SNNetBase::checkIncomingData()
 {
-    if(_session == NULL) {
-        LOG("checkIncomingData: session is NULL");
+    if(_mainSession == nullptr) {
+        LOG("checkIncomingData: _mainSession is NULL");
         return false;
     }
     
     // log("Checking Incoming data");
     size_t nRead = 0;
-    if(_session->isConncting(nRead) == false) {  // check for data
+    if(_mainSession->isConncting(nRead) == false) {  // check for data
         return false;
     }
     
     // log("Checking receive data");
-    _session->receiveData();
+    _mainSession->receiveData();
     
     return true;
 }
@@ -65,19 +77,20 @@ void SNNetBase::queueToOutBuffer(SNString &str)
         return;
     }
     
-    if(_session) {
-        _session->putBufferWithStr(str);
+    if(_mainSession) {
+        _mainSession->putBufferWithStr(str);
     }
 }
 
 void SNNetBase::sendDataOut()
 {
-    if(_session == nullptr) {
+    
+    if(_mainSession == nullptr) {
         //LOG("session is null");
         return;
     }
     
-    _session->flushBuffer();
+    _mainSession->flushBuffer();
 }
 
     

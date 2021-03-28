@@ -17,14 +17,14 @@
 
 namespace simpleNet {
 
-class SNSession {
+class SNSession : NonCopyable {
 public:
     SNSession(SNSocket *socket);
     SNSession(SNSocket &&socket);
     virtual ~SNSession();           // ken: why need virtual??
 
     SNSocket _mySocket;
-    SNSocket *_socket = nullptr;      // ken: the socketing connecting the client or server
+    // SNSocket *_socket = nullptr;      // ken: the socketing connecting the client or server
     bool isHost;           
     
     

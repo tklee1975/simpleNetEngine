@@ -11,16 +11,15 @@
 namespace simpleNet {
 
 
-SNSession::SNSession(SNSocket *socket)
-{
-    _socket = socket;
-    
-    _isAlive = _socket == nullptr ? false : true;
-}
+//SNSession::SNSession(SNSocket *socket)
+//{
+//    _socket = socket;
+//
+//    _isAlive = _socket == nullptr ? false : true;
+//}
 
 SNSession::SNSession(SNSocket &&socket)
 :_mySocket(std::move(socket))
-//:_mySocket(socket)
 {
     _isAlive = true; // _mySocket.;
     std::cout << "SNSession: move constructor\n";
@@ -30,11 +29,11 @@ SNSession::SNSession(SNSocket &&socket)
 
 SNSession::~SNSession()
 {
-    if(_socket != nullptr)
-    {
-        _socket->close();
-        _socket = nullptr;
-    }
+//    if(_socket != nullptr)
+//    {
+//        _socket->close();
+//        _socket = nullptr;
+//    }
     _mySocket.close();
 }
     
@@ -47,25 +46,14 @@ void SNSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 int SNSession::sendData(std::vector<u8> &dataBuf)
 {
     int result = _mySocket.send(dataBuf.data(), dataBuf.size());
-    LOG("sendData: result=%d", result);
+    //LOG("sendData: result=%d", result);
     
     return result;
-//    if(!_socket) {
-//        return 0;
-//    }
-//
-//
-//    return _socket->send(dataBuf.data(), dataBuf.size());
 }
 
 size_t SNSession::availableBytesToRead()
 {
     return _mySocket.availableBytesToRead();
-//    if(!_socket) {
-//        return 0;
-//    }
-//
-//    return _socket->availableBytesToRead();
 }
 
 void SNSession::setConnected(bool isHostFlag)
@@ -78,21 +66,15 @@ void SNSession::receiveData() {
     size_t nRead = availableBytesToRead();
     // log("SNSession.receiveData: nRead=%d", nRead);
     if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
-        //std::cout << "Nothing received\n";
         //sleep(1);       // 1 second     //
         return;
     }
-    
-//    if(!_socket) {
-//        return;
-//    }
-//
-    //_socket->recv(_inBuffer, nRead);
+
     _mySocket.recv(_inBuffer, nRead);
     _inBuffer.push_back(0);   // add the character '\0' to make it a string
 
     std::string strValue = std::string(_inBuffer.begin(), _inBuffer.end());
-    std::cout << "receiveData: " << strValue << "\n";
+    // std::cout << "receiveData: " << strValue << "\n";
     
     onRecvData(_inBuffer, nRead);
 }
@@ -100,9 +82,7 @@ void SNSession::receiveData() {
 
 void SNSession::close() {
     _isAlive = false;
-    if(! _socket) {
-        _socket->close();
-    }
+    
     _mySocket.close();
 }
 

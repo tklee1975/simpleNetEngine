@@ -37,11 +37,6 @@ public:
 
 class TestEchoClientSessionFactory : public SNSessionFactory {
 public:
-   
-//    virtual SNSession *create(SNSocket *socket) override {
-//        return new TestEchoClientSession(socket);
-//    }
-//    
     
     
     virtual std::unique_ptr<SNSession> newSession(SNSocket &&socket) override {

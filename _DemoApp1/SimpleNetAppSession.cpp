@@ -9,26 +9,24 @@
 #include "SimpleNetApp.h"
 
 
-SimpleHostSession::SimpleHostSession(SNSocket &&_sock)
+SimpleHostSession::SimpleHostSession(SNSocket && _sock, SimpleNetApp &_app, bool _isHost)
     : SNSession(std::move(_sock))
+    , mainApp(_app)
+    , isHost(_isHost)
 {
     
 }
 
 SimpleHostSession::~SimpleHostSession()
 {
-    if(app) {
-        app.reset();
-    }
 }
 
 
 void SimpleHostSession::onConnect()
 {
     std::cout << "Connected to client\n";
-    if(app != nullptr) {
-        app->onConnected();
-    }
+    
+    mainApp.onConnected();
 }
 
 void SimpleHostSession::onDisconnect()
@@ -42,10 +40,6 @@ void SimpleHostSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
         return;
     }
     
-    if(app == nullptr) {
-        return;
-    }
-    
     buf[nRead] = '\0';
     
     std::vector<u8> cleanBuffer = std::vector<u8>(buf.begin(), buf.begin()+nRead);  // ken: HACK: how to make it better, no need the copy action
@@ -54,9 +48,8 @@ void SimpleHostSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
     extractCommands(cleanBuffer, _cmdList);
     
     for(int i=0; i<_cmdList.size(); i++) {
-        app->onReceiveCommand(_cmdList[i]);
+        mainApp.onReceiveCommand(_cmdList[i]);
     }
-    
 }
 
 
@@ -95,7 +88,6 @@ void SimpleHostSession::extractCommands(
         
         
         if(_remainCommandBuf.size() > 0) {
-           //command.append(_remainCommandBuf.data());
             newPart.append(_remainCommandBuf.begin(), _remainCommandBuf.end());
            _remainCommandBuf.clear();
         }

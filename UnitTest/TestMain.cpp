@@ -12,6 +12,7 @@
 #include "TestNetSession.h"
 #include <fcntl.h> /* Added for the nonblocking socket */
 #include "../_DemoApp1/SimpleNetAppSession.h"
+#include "../_DemoApp1/SimpleNetApp.h"
 
 using namespace simpleNet;
 using namespace std;
@@ -106,7 +107,8 @@ void testExtractCommands() {
     };
     
     SNSocket sock;
-    SimpleHostSession session(std::move(sock));
+    SimpleNetApp app;
+    SimpleHostSession session(std::move(sock), app, true);
     std::vector<SNString> result;
     
     for(int i=0; i<3; i++) {
@@ -124,17 +126,6 @@ void testExtractCommands() {
             cout << "RESULT-" << i << ": " << result[i].str() << "\n";
         }
     }
-//
-//    strcpy(data, "abcd\n");
-//    cout << data << "\n";
-//
-//    std::vector<char> buffer1(data, data+strlen(data));
-//    strValue = string(buffer1.begin(), buffer1.end());
-//    cout << "buffer1: " << strValue << "\n";
-//
-//
-//    strcpy(data, "efg\n");
-//    cout << data << "\n";
 }
 
 void testStringAppendU8() {

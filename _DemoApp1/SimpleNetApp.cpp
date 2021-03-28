@@ -18,16 +18,8 @@ const int kPort = 4567;
 
 SimpleNetApp::SimpleNetApp()
 {
-    shared_ptr<SimpleNetApp> thisPtr(this);
-//
-//    _clientFactory(thisPtr, false);
-    //auto myPtr = std::make_shared<SimpleNetApp>(this);
-    //shared_ptr<SimpleSessionFactory> hostPtr(this);
-    //auto hostFactoryPtr
-    //auto thisPtr = this;
-    
-    _host.setSessionFactory(make_shared<SimpleSessionFactory>(thisPtr, true));
-    _client.setSessionFactory(make_shared<SimpleSessionFactory>(thisPtr, false));
+    _host.setSessionFactory(make_shared<SimpleSessionFactory>(*this, true));    // ken: is '*this' is used how to get my reference?
+    _client.setSessionFactory(make_shared<SimpleSessionFactory>(*this, false));
     
     _errorMsg = SNString("");
 }

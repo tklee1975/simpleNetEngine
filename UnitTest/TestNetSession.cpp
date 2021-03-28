@@ -44,11 +44,6 @@ void TestHttpGetSession::onRecvData(std::vector<u8> &buf, size_t &nRead)
 
 // --------------- 
 
-TestEchoClientSession::TestEchoClientSession(SNSocket *sock) : SNSession(sock)
-{
-    
-}
-
 
 //TestEchoClientSession(SNSocket &&);
 TestEchoClientSession::TestEchoClientSession(SNSocket &&sock)

@@ -40,7 +40,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 ```
 
-Step 4: Add link library in CMakeList 
+Step 4: Add link library in CMakeList firstName
 target_link_libraries(MyApp PRIVATE imgui::imgui)
 
 

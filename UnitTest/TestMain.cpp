@@ -8,6 +8,8 @@
 #include <EASTL/vector.h>
 #include <EASTL/fixed_vector.h>
 #include <fmt/core.h>
+#include <simpleNet/BinSerializer.h>
+#include <simpleNet/BinDeserializer.h>
 
 #include "TestNetSession.h"
 #include <fcntl.h> /* Added for the nonblocking socket */
@@ -16,6 +18,29 @@
 
 using namespace simpleNet;
 using namespace std;
+
+void testSerializeWriteInt() {
+    SNVector<u8> buffer;
+    
+    SNBinSerializer se(buffer);
+    
+    int data = 128;
+    se.writeInt(data); //
+    
+    data = 100;
+    se.writeInt(data); //
+    //
+    
+    se.dumpBuffer(10, 'd');
+    
+    SNBinDeserializer de(buffer);
+    int result;
+    de.readInt(result);
+    cout << "Result: " << result << "\n";
+    
+    de.readInt(result);
+    cout << "Result: " << result << "\n";
+}
 
 void testSimpleSession()
 {
@@ -838,6 +863,7 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
+    testSerializeWriteInt();
     // testSimpleSession();
     // testCopySocket();
     
@@ -852,7 +878,7 @@ void runSingleTest() {
     // testTrimStr();
     //testSplitStr();
     //testExtractCommands();
-    testSampleClientSession();
+    //testSampleClientSession();
     //testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();

@@ -14,6 +14,7 @@ set(DEMO1_PATH          "_DemoApp1")
 
 set(CORE_LIB_NAME       "CoreLib")
 set(CORE_LIB_PATH       "Library/CoreLib")
+set(CORE_LIB_TEST_PATH  "Library/CoreLib/test")
 
 set(NET_ENGINE_NAME     "NetEngine")
 set(NET_ENGINE_PATH     "Library/NetEngine")
@@ -34,8 +35,10 @@ find_package(imgui CONFIG REQUIRED)
 
 ## Define the library and main source 
 add_subdirectory(${CORE_LIB_PATH})
+add_subdirectory(${CORE_LIB_TEST_PATH})
 add_subdirectory(${NET_ENGINE_PATH})
 add_subdirectory(${IMGUI_HELPER_PATH})
+
 
 ## Define 
 add_executable(app1

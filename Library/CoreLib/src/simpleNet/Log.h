@@ -10,7 +10,7 @@
 #pragma once
 
 #include <stdio.h>
-#include "Nocopyable.h"
+#include "NonCopyable.h"
 #include <fmt/format.h>
 #include <iostream>
 

@@ -16,8 +16,9 @@ set(CORE_LIB_NAME       "CoreLib")
 set(CORE_LIB_PATH       "Library/CoreLib")
 set(CORE_LIB_TEST_PATH  "Library/CoreLib/test")
 
-set(NET_ENGINE_NAME     "NetEngine")
-set(NET_ENGINE_PATH     "Library/NetEngine")
+set(NET_ENGINE_NAME         "NetEngine")
+set(NET_ENGINE_PATH         "Library/NetEngine")
+set(NET_ENGINE_TEST_PATH    "Library/NetEngine/test")
 
 set(IMGUI_HELPER_NAME   "ImguiHelper")
 set(IMGUI_HELPER_PATH   "Library/ImguiHelper")
@@ -37,6 +38,7 @@ find_package(imgui CONFIG REQUIRED)
 add_subdirectory(${CORE_LIB_PATH})
 add_subdirectory(${CORE_LIB_TEST_PATH})
 add_subdirectory(${NET_ENGINE_PATH})
+add_subdirectory(${NET_ENGINE_TEST_PATH})
 add_subdirectory(${IMGUI_HELPER_PATH})
 
 

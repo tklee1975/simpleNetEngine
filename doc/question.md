@@ -1,5 +1,12 @@
 # Q & A 
 
+## Socket Send 
+if socket.send always send out buffer given 
+or may possibly send partially ? 
+if send partially, how to handle?
+
+-> The packet buffer will fully send 
+    or else the network should have some problems
 
 ## How to organise the buffer better?
 ```cpp

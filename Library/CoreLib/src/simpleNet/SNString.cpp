@@ -73,6 +73,10 @@ namespace simpleNet {
         //return list;
     }
 
+    void SNString::clear() {
+        _buf.clear();
+    }
+
     void SNString::set(const char *newStr){
         _buf.clear();
         _buf.append(newStr);
@@ -83,6 +87,11 @@ namespace simpleNet {
 //    {
 //    //    _buf.append(first, last);
 //    }
+
+    void SNString::append(SNVector<u8> &buffer)
+    {
+        _buf.append(buffer.begin(), buffer.end());
+    }
 
     void SNString::append(const std::string &sStr)
     {

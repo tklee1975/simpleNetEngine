@@ -42,7 +42,7 @@ void testSerializeWriteInt() {
     cout << "Result: " << result << "\n";
 }
 
-void testSimpleSession()
+void testSimpleHttpSession()
 {
     SNSocketAddr addr;
     addr.setIPv4(127, 0, 0, 1);
@@ -62,7 +62,7 @@ void testSimpleSession()
     bool didSend = false;
     for(int i=0; i<1000; i++) {
         size_t nRead = 0;
-        if(session.isConncting(nRead) == false) {  // check for data
+        if(session.isConncting() == false) {  // check for data
             //std::cout << "Nothing received\n";
             //sleep(1);
             break;
@@ -863,8 +863,8 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testSerializeWriteInt();
-    // testSimpleSession();
+    //testSerializeWriteInt();
+    // void testSimpleHttpSession();
     // testCopySocket();
     
     // testStr();
@@ -879,12 +879,12 @@ void runSingleTest() {
     //testSplitStr();
     //testExtractCommands();
     //testSampleClientSession();
-    //testSampleHostSession();
+    // testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();
     //testRebindSocket();
-    //testEchoServer();
+    testEchoServer();
     //testServerUsingSession();
     //testSimpleString();
     //testEastlVector();        // ken: not ready 

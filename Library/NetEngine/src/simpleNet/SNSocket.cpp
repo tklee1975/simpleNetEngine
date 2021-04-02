@@ -293,21 +293,24 @@ size_t SNSocket::availableBytesToRead()
 
 
 
-void SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
+int SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv, int option)
 {
     buf.clear();
     
     if (bytesToRecv > INT_MAX) {
-        throw SNError("recv: bytesToRecv is too big");
+        //throw SNError("recv: bytesToRecv is too big");
+        return -1;
     }
     
     buf.resize(bytesToRecv);
 
-    int ret = ::recv(_sock, buf.data(), (int)bytesToRecv, 0);
+    int ret = ::recv(_sock, buf.data(), (int)bytesToRecv, option);
     if (ret < 0) {
-        throw SNError("recv: fail to recv");
+        //throw SNError("recv: fail to recv");
+        return ret;
     }
 
+    return ret;
 }
 
 void SNSocket::mockConnect()

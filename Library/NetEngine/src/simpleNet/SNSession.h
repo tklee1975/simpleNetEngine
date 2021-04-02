@@ -39,23 +39,24 @@ public:
     void close();
     bool isAlive();
     bool hasData();
-    bool isConncting(size_t &availableByte);
+    //bool isConncting(size_t &availableByte);
+    bool isConncting();
     void receiveData();
     void putBufferWithStr(SNString &str);
     void flushBuffer();
     
 protected:  // implemented by the subclass
-    virtual void onConnect() = 0;
+    virtual void onConnect() {}
     virtual void onDisconnect() {}
-    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead) = 0; // ken: use & reference to save copy
+    virtual void onUpdate() {}
+    virtual void onRecvFromSocket();
+    virtual void onRecvData(std::vector<u8> &buf, size_t &nRead); // ken: use & reference to save copy
     
 private:
     std::vector<u8> _outBuffer;
     std::vector<u8> _inBuffer;            // ken: use to store the incoming buffer
     bool _isAlive;
     
-    
-    size_t availableBytesToRead();
 };
 
 

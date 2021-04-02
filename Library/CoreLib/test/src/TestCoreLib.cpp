@@ -10,6 +10,25 @@
 using namespace simpleNet;
 using namespace std;
 
+void testDumpHex() {
+    std::cout << "Dump Hex\n";
+    
+    
+    SNVector<u8> data;
+    data.resize(10);
+    for(int i=0; i<10; i++) {
+        data[i] = 50 + i;
+    }
+    
+    SNString result;
+    SNStringUtil::binToHex(result, data);
+    std::cout << "RESULT: " << result.str() << "\n";
+    
+    SN_DUMP_HEX(data);
+    //std::string str(data.begin(), data.end());
+    //cout << "STR: [" << str << "]\n";
+}
+
 //io_raw
 void testRaw()
 {
@@ -23,14 +42,16 @@ void testRaw()
     }
     
     se.ioRaw(data, 10);
+    se.ioRaw(data, 10);
     se.dumpBuffer(10);
     
+    cout << "BufferSize: " << buffer.size() << "\n";
     //
     u8 result[10];
     SNBinDeserializer de(buffer);
     
     de.ioRaw(result, 10);
-    for(u8 byte : result) { printf("%02x ", byte); }
+    //for(u8 byte : result) { printf("%02x ", byte); }
     printf("\n");
 }
 
@@ -103,7 +124,8 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testRaw();
+    testDumpHex();
+    // testRaw();
     // testFixed();
     // testSerializeWriteInt();
     // test1();

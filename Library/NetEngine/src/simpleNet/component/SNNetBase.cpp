@@ -58,13 +58,16 @@ bool SNNetBase::checkIncomingData()
     }
     
     // log("Checking Incoming data");
-    size_t nRead = 0;
-    if(_mainSession->isConncting(nRead) == false) {  // check for data
+    //size_t nRead = 0;
+    if(_mainSession->isConncting() == false) {  // check for data
+        LOG("checkIncomingData: No connecting");
         return false;
     }
     
     // log("Checking receive data");
     _mainSession->receiveData();
+    
+    
     
     return true;
 }
@@ -85,7 +88,7 @@ void SNNetBase::queueToOutBuffer(SNString &str)
 void SNNetBase::sendDataOut()
 {
     
-    if(_mainSession == nullptr) {
+    if(_mainSession == nullptr) {   // session not yet ready 
         //LOG("session is null");
         return;
     }

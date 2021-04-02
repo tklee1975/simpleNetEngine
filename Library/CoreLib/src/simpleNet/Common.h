@@ -25,7 +25,16 @@ inline void sleep(int sec) {
 #endif
 }
 
-// Helper Macro
+//std::cout << "DUMP_HEX: " << tmp << "\n"; \
+//// Helper Macro
+#define SN_DUMP_HEX(v) \
+    do{ \
+        SNString tmp; \
+        SNStringUtil::binToHex(tmp, v); \
+        std::cout << "HEX: " << tmp.str() << "\n"; \
+    } while(false) \
+//------
+
 
 // Common class
 

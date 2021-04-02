@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(PROJECT_NAME core_test)
+set(PROJECT_NAME net_engine_test)
 message("==== ${PROJECT_NAME} ====")
 project(${PROJECT_NAME})
 
@@ -21,5 +21,7 @@ endforeach()
 # message("CoreLibTest: search_src_files = ${search_src_files}")
 
 add_executable(${PROJECT_NAME} ${search_src_files})
+#add_executable(${PROJECT_NAME} src/TestCoreLib.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE CoreLib)
+target_link_libraries(${PROJECT_NAME} PRIVATE NetEngine)

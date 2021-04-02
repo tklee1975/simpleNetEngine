@@ -15,7 +15,7 @@
 
 ## Wish List 
 [18] install eastl 
-orordp[32] One Host to many client
+[32] One Host to many client
 [33] Connect using hostname or ip string 
 [34] Install Pack for others?
 [17] Change Shell script to python ??

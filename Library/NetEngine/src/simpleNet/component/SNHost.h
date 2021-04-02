@@ -39,7 +39,7 @@ private:
 //    SNSessionFactory* _factory = NULL;
 //    SNSession *_session = NULL;         // connected session
 //    SNSocket *_clientSocket = NULL;           // connected socket
-    SNSocket *_serverSocket = NULL;
+    SNSocket *_serverSocket = nullptr;
     int _port = 0;
     SNHostState _state;
     

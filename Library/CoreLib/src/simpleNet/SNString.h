@@ -12,9 +12,11 @@
 #include <vector>
 #include <string>
 #include "Type.h"
-#include <simpleNet/CoreLib.h>
+#include "Vector.h"
 
 namespace simpleNet {
+
+
 
 
 class SNString {
@@ -25,12 +27,14 @@ public:
     const std::string &str() const;
     const char * c_str() const;
     
+    void clear();
     void split(std::vector<SNString> &list, const char *delimiter);
     
     void set(const char *newStr);
     
     void append(const char *newStr);
     void append(const std::string &sStr);
+    void append(SNVector<u8> &buffer);
     //template <class InputIterator>
     //void append(InputIterator first, const InputIterator last);
 //    void append(std::vector::iterator<char *> first,
@@ -50,6 +54,26 @@ public:
     void rtrim();
 private:
     std::string _buf;
+};
+
+class SNStringUtil {
+public:
+    static void binToHex(SNString& result, SNVector<u8> data) {
+        char str[5];
+        
+        result.clear();
+        //result.append(data);
+        for (int i=0; i<data.size(); i++) {
+            sprintf(str, "%02x ", data[i]);
+            
+            result.append(str);
+        }
+//        result.clear();
+//        appendBinToHex(result, data.data(), data.size());
+        //result.clear();
+    }
+
+    
 };
 
 

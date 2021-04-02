@@ -51,10 +51,6 @@ int SNSession::sendData(std::vector<u8> &dataBuf)
     return result;
 }
 
-size_t SNSession::availableBytesToRead()
-{
-    return _mySocket.availableBytesToRead();
-}
 
 void SNSession::setConnected(bool isHostFlag)
 {
@@ -63,8 +59,13 @@ void SNSession::setConnected(bool isHostFlag)
 }
 
 void SNSession::receiveData() {
-    size_t nRead = availableBytesToRead();
-    // log("SNSession.receiveData: nRead=%d", nRead);
+    onRecvFromSocket();
+    onUpdate();
+}
+
+void SNSession::onRecvFromSocket() {
+    
+    size_t nRead = _mySocket.availableBytesToRead();
     if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
         //sleep(1);       // 1 second     //
         return;
@@ -73,12 +74,12 @@ void SNSession::receiveData() {
     _mySocket.recv(_inBuffer, nRead);
     _inBuffer.push_back(0);   // add the character '\0' to make it a string
 
-    std::string strValue = std::string(_inBuffer.begin(), _inBuffer.end());
+    //std::string strValue = std::string(_inBuffer.begin(), _inBuffer.end());
     // std::cout << "receiveData: " << strValue << "\n";
     
     onRecvData(_inBuffer, nRead);
-}
 
+}
 
 void SNSession::close() {
     _isAlive = false;
@@ -86,9 +87,12 @@ void SNSession::close() {
     _mySocket.close();
 }
 
-bool SNSession::isConncting(size_t &availableByte)
+//bool SNSession::isConncting(size_t &availableByte)
+bool SNSession::isConncting()
 {
-    size_t result = availableBytesToRead();
+    std::vector<u8> testBuf(1);
+    int ret = _mySocket.recv(testBuf, 1, MSG_PEEK);
+    //size_t result = _mySocket.availableBytesToRead();
     //log("SNSession.isConncting: nRead=%d", result);
     
     // KEN: todo: Check for disconnection
@@ -97,8 +101,13 @@ bool SNSession::isConncting(size_t &availableByte)
 //    if(nRead == 0) {    // ken: nRead = 0 if not data retrieved at the moment
 //        return false;
 //    }
-    availableByte = result;
-    return true;
+    //availableByte = result;
+    bool isConnectd = ret != 0; // ret == 0 when client is disconnectd
+    if(isConnectd == false) {
+        onDisconnect();
+    }
+    
+    return isConnectd;
 }
 
 bool SNSession::isAlive() {

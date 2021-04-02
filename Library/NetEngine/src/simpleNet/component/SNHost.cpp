@@ -170,41 +170,14 @@ void SNHost::checkNetworkWhenWaitClient()
 
 void SNHost::checkNetworkWhenConnect()
 {
-    checkIncomingData();
+    bool isConnected = checkIncomingData();
+    if(isConnected == false) {
+        
+        _mainSession.release();
+        _mainSession = nullptr;
+        _state = SNHostStatetWaitForClient;
+        LOG("Switching HostState");
+    }
 }
-//
-//void SNHost::queueToOutBuffer(SNString &str)
-//{
-//    if(str.str().size() == 0) {
-//        return;
-//    }
-//
-//    if(_session != NULL) {
-//        _session->putBufferWithStr(str);
-//    }
-//}
-//
-//void SNHost::sendDataOut()
-//{
-//    if(_session == NULL) {
-//        return;
-//    }
-//
-//    _session->flushBuffer();
-//}
-//
-//bool SNHost::checkIncomingData()
-//{
-//    // log("Checking Incoming data");
-//    size_t nRead = 0;
-//    if(_session->isConncting(nRead) == false) {  // check for data
-//        return false;
-//    }
-//
-//    // log("Checking receive data");
-//    _session->receiveData();
-//
-//    return true;
-//}
-    
-} // End of Namespace
+
+}

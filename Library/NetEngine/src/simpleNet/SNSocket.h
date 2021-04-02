@@ -77,7 +77,7 @@ public:
     void connect(const SNSocketAddr& addr);
     bool listen(int backLog);
     //int send(const SNSocketAddr& addr, const char* data, size_t dataSize);    // no use??
-    void recv(std::vector<u8> & buf, size_t bytesToRecv);
+    int recv(std::vector<u8> & buf, size_t bytesToRecv, int option=0);
     bool accept(SNSocket &acceptedSocket);
     SNSocketAcceptStatus attempAccept(SNSocket &acceptedSocket);
     

@@ -23,11 +23,7 @@ SNClient::SNClient() : SNNetBase()
 
 bool SNClient::connectServer(const SNSocketAddr &addr)
 {
-//    if(_factory == nullptr) {
-//        std::cout << "SNClient: sessionFactory undefined\n";
-//        return false;
-//    }
-//    
+
     SNSocket newSock;
     
     newSock.createTCP();

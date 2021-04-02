@@ -17,8 +17,17 @@ namespace simpleNet {
     public:
         SNBinSerializer(SNVector<u8> &buffer) : _buffer(&buffer){}   //Vector<u8>& buf) : _buf(&buf) {} why &buf ?
         
-        void io(i8 & value)     { _ioFixed(value); }
-        void io(i16 & value)    { _ioFixed(value); }
+        void io(i8& value)     { _ioFixed(value); }
+        void io(i16& value)    { _ioFixed(value); }
+        void io(i32& value)    { _ioFixed(value); }
+        void io(i64& value)    { _ioFixed(value); }
+        
+        void io(u8 & value)     { _ioFixed(value); }
+        void io(u16 & value)    { _ioFixed(value); }
+        void io(u32 & value)    { _ioFixed(value); }
+        void io(u64 & value)    { _ioFixed(value); }
+
+        
         void ioRaw(u8* data, size_t dataSize) {
                 auto* src = _reserveBuffer(dataSize);
                 std::copy(data, data+dataSize, src);

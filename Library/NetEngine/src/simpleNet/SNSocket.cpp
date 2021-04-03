@@ -8,7 +8,6 @@
 
 #include "SNSocket.h"
 #include <iostream>
-#include <unistd.h>
 #include <exception>
 #include <simpleNet/CoreLib.h>
 #include <fcntl.h> /* Added for the nonblocking socket */
@@ -16,6 +15,9 @@
 #define BACKLOG 10
 
 namespace simpleNet {
+
+
+
 
 /**
  SNSocketAddr
@@ -76,6 +78,7 @@ public:
 #endif
 };
 
+
 SNSocket::SNSocket()
 {
     _enableReuseAddress = false;
@@ -87,6 +90,10 @@ SNSocket::SNSocket(SNSocket &&other)
     // Copy
     std::cout << "Move Constructor is called\n";
     other._sock = INVALID_SOCKET;
+}
+
+void SNSocket::platformInit() {
+    SNSocketInit::init();
 }
 
 int SNSocket::getSockFd()
@@ -101,17 +108,24 @@ void SNSocket::setReuseAddress(bool enableReuse)
 
 void SNSocket::setNonBlock(bool nonBlock)
 {
+#ifdef _WIN32
+    u_long v = nonBlock ? 1 : 0;
+    ::ioctlsocket(_sock, FIONBIO, &v);
+#else 
     int flags;
-    flags = ::fcntl(_sock ,F_GETFL,0);   // F_GETFL =  Get the file access mode
+    flags = ::fcntl(_sock, F_GETFL, 0);   // F_GETFL =  Get the file access mode
                                         //           and the file status flags;
     //assert(flags != -1);
-    if(nonBlock) {
+    if (nonBlock) {
         ::fcntl(_sock, F_SETFL, flags | O_NONBLOCK);     // Set the mode to nonBlock
         //::fcntl(_sock, F_SETFL, flags |);     // Set the mode to nonBlock
-    } else {
-        fcntl(_sock, F_SETFL, flags & ~O_NONBLOCK);    // unset nonBlocking flag
-        
     }
+    else {
+        fcntl(_sock, F_SETFL, flags & ~O_NONBLOCK);    // unset nonBlocking flag
+
+    }
+
+#endif 
 }
 
 /**
@@ -133,6 +147,8 @@ void SNSocket::close()
 
 void SNSocket::createTCP()
 {
+    platformInit();
+    
     close();
 
     _sock = ::socket(AF_INET, SOCK_STREAM, 0);
@@ -150,9 +166,16 @@ void SNSocket::enableReuseAddress(const SNSocketAddr& addr)
         std::cout << "enableReuseAddress: socket not ready\n";
         return;
     }
+
+#if !_WIN32
+    setsockopt(_sock, SOL_SOCKET, SO_REUSEPORT,
+        reinterpret_cast<const char*>(&addr._addr),
+        static_cast<int>(sizeof(addr._addr)));
+#endif  
     setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR,
-               reinterpret_cast<const char*>(&addr._addr),
-               static_cast<int>(sizeof(addr._addr)));
+        reinterpret_cast<const char*>(&addr._addr),
+        static_cast<int>(sizeof(addr._addr)));
+
     std::cout << "DEBUG: enableReuseAddress: option is set\n";
 }
 
@@ -191,14 +214,27 @@ bool SNSocket::listen(int backLog)
 }
 
 
-void SNSocket::connect(const SNSocketAddr& addr)
+bool SNSocket::connect(const SNSocketAddr& addr)
 {
     int ret = ::connect(_sock, &addr._addr, sizeof(addr._addr));
     if (ret < 0) {
+
+#ifdef _WIN32
+        int e = WSAGetLastError();
+        if (e == WSAEWOULDBLOCK) // connect in non-blocking mode
+            return false;
+#else
+        int e = errno;
+        if (e == EINPROGRESS) // connect in non-blocking mode
+            return false;
+#endif
+
         ERROR_LOG("connect: fail to connect: %d; error=%d", ret, errno);
         throw SNError("connect");
     }
     ERROR_LOG("connect: Socket connected");
+    
+    return true;
 }
 
 SNSocketAcceptStatus SNSocket::attempAccept(SNSocket &acceptedSocket)
@@ -255,7 +291,8 @@ int SNSocket::send(const u8* data, size_t dataSize)
         return -1;
     }
 
-    int ret = ::send(_sock, data, (int)dataSize, 0);
+    int ret = ::send(_sock, reinterpret_cast<const char *>(data),
+                        static_cast<int>(dataSize), 0);
     if (ret < 0) {
         std::cout << "Fail to send " << ret << "\n";
         return -1;
@@ -270,6 +307,7 @@ size_t SNSocket::availableBytesToRead()
 {
 #ifdef _WIN32
     u_long n = 0;
+
     if (0 != ::ioctlsocket(_sock, FIONREAD, &n)) {
         throw SNError("availableBytesToRead");
     }
@@ -293,7 +331,7 @@ size_t SNSocket::availableBytesToRead()
 
 
 
-void SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
+int SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
 {
     buf.clear();
     
@@ -303,11 +341,13 @@ void SNSocket::recv(std::vector<u8> & buf, size_t bytesToRecv)
     
     buf.resize(bytesToRecv);
 
-    int ret = ::recv(_sock, buf.data(), (int)bytesToRecv, 0);
+    int ret = ::recv(_sock, reinterpret_cast<char *>(buf.data()), 
+                        static_cast<int>(bytesToRecv), 0);
     if (ret < 0) {
         throw SNError("recv: fail to recv");
     }
 
+    return ret;
 }
 
 void SNSocket::mockConnect()

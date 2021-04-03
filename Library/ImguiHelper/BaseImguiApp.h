@@ -6,6 +6,7 @@
 
 #ifndef SNBaseImageApp_H
 #define SNBaseImageApp_H
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include "imgui.h"
 

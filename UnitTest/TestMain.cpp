@@ -471,11 +471,13 @@ void test() {
 //
 void setNonblock(int socket)
 {
-    int flags;
-    flags = fcntl(socket ,F_GETFL,0);   // F_GETFL =  Get the file access mode
-                                        //           and the file status flags;
-    assert(flags != -1);
-    fcntl(socket, F_SETFL, flags | O_NONBLOCK);     // Set the mode to nonBlock
+
+    // ken: this's not working in WIN
+   // int flags;
+   //flags = fcntl(socket ,F_GETFL,0);   // F_GETFL =  Get the file access mode
+   //                                     //           and the file status flags;
+   // assert(flags != -1);
+   // fcntl(socket, F_SETFL, flags | O_NONBLOCK);     // Set the mode to nonBlock
 }
 // Reference:
 //  https://stackoverflow.com/questions/6714425/simple-socket-non-blocking-i-o/6714551
@@ -852,13 +854,13 @@ void runSingleTest() {
     // testTrimStr();
     //testSplitStr();
     //testExtractCommands();
-    testSampleClientSession();
+    //testSampleClientSession();
     //testSampleHostSession();
     // testNonBlockingServer();
     // testClientWithSession();
     // testClient();
     //testRebindSocket();
-    //testEchoServer();
+    testEchoServer();
     //testServerUsingSession();
     //testSimpleString();
     //testEastlVector();        // ken: not ready 
@@ -883,7 +885,14 @@ void runAllTest() {
     test1();
 }
 
-int main(int argc, char** argv) {
+#if _WIN32
+int main(void){
+    std::cout << "Windows Run\n";
+    runSingleTest();
+}
+#else 
+int main(int argc, char** argv) 
+{
     printf("Running UnitTest: %d\n", argc);
 
     if(argc <= 1) {
@@ -891,7 +900,7 @@ int main(int argc, char** argv) {
         return 0;
     }
     // std::cout << "Input: " <<  argv[1] << "\n";
-    if(strcasecmp(argv[1], "all") == 0) {
+    if(my_strcasecmp(argv[1], "all") == 0) {
         runAllTest();
     } else {
         runSingleTest();
@@ -899,3 +908,4 @@ int main(int argc, char** argv) {
 
     return 0;
 } 
+#endif 

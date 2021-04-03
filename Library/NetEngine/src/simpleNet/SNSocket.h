@@ -69,15 +69,18 @@ public:
         close();
     }
 
+    static void platformInit();
+    int getSockError();
     void createUDP();
     void createTCP();
     void close();
 
     bool bind(const SNSocketAddr& addr);
-    void connect(const SNSocketAddr& addr);
+    bool connect(const SNSocketAddr& addr);
     bool listen(int backLog);
     //int send(const SNSocketAddr& addr, const char* data, size_t dataSize);    // no use??
     int recv(std::vector<u8> & buf, size_t bytesToRecv, int option=0);
+
     bool accept(SNSocket &acceptedSocket);
     SNSocketAcceptStatus attempAccept(SNSocket &acceptedSocket);
     

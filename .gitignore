@@ -17,6 +17,9 @@ _deps
 build
 xcode_prj
 
+## VS2019 
+vs2019
+
 ## VSCode 
 .vscode
 

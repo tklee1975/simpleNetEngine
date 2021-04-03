@@ -856,11 +856,11 @@ void runSingleTest() {
     //testExtractCommands();
     //testSampleClientSession();
     //testSampleHostSession();
-    // testNonBlockingServer();
+    testNonBlockingServer();
     // testClientWithSession();
     // testClient();
     //testRebindSocket();
-    testEchoServer();
+    //testEchoServer();
     //testServerUsingSession();
     //testSimpleString();
     //testEastlVector();        // ken: not ready 

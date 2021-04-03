@@ -70,6 +70,7 @@ public:
     }
 
     static void platformInit();
+    int getSockError();
     void createUDP();
     void createTCP();
     void close();

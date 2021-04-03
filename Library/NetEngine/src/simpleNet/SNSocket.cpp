@@ -148,6 +148,7 @@ void SNSocket::close()
 void SNSocket::createTCP()
 {
     platformInit();
+
     
     close();
 
@@ -158,6 +159,17 @@ void SNSocket::createTCP()
         return;
     }
     // std::cout << "socket okay. sock=" << _sock << "\n";
+}
+
+
+int SNSocket::getSockError() 
+{
+#if _WIN32
+    int ret = WSAGetLastError();
+#else
+    int ret = errno;
+#endif
+    return ret;
 }
 
 void SNSocket::enableReuseAddress(const SNSocketAddr& addr)
@@ -243,11 +255,32 @@ SNSocketAcceptStatus SNSocket::attempAccept(SNSocket &acceptedSocket)
 
     // https://jameshfisher.com/2017/04/05/set_socket_nonblocking/
     int value = ::accept(_sock, nullptr, nullptr);
-    if(value == -1) {
-        if (errno == EWOULDBLOCK) {
+
+//#ifdef _WIN32
+//    int e = WSAGetLastError();
+//    if (e == WSAEWOULDBLOCK) // connect in non-blocking mode
+//        return false;
+//#else
+//    int e = errno;
+//    if (e == EINPROGRESS) // connect in non-blocking mode
+//        return false;
+//#endif
+//
+
+    if (value == -1) {
+        int err = getSockError();
+#if _WIN32
+        if (err == WSAEWOULDBLOCK){
             return SNSocketAcceptStatus::Pending;
         }
         return SNSocketAcceptStatus::Fail;
+#else 
+        if (err == EWOULDBLOCK) {
+            return SNSocketAcceptStatus::Pending;
+        }
+        return SNSocketAcceptStatus::Fail;
+
+#endif 
     }
     
     acceptedSocket._sock = value;

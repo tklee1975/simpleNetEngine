@@ -6,6 +6,7 @@
 //
 
 #include "SNString.h"
+#include <iterator>
 
 namespace simpleNet {
 

@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
         return 0;
     }
     // std::cout << "Input: " <<  argv[1] << "\n";
-    if(strcasecmp(argv[1], "all") == 0) {
+    if(my_strcasecmp(argv[1], "all") == 0) {
         runAllTest();
     } else {
         runSingleTest();

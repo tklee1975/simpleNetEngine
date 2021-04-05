@@ -8,8 +8,6 @@
 #include <simpleNet/BinDeserializer.h>
 #include "TestPacketSession.h"
 #include <simpleNet/session/SNTestPacket.h>
-#include "TestPacketSession.h"
-#include <simpleNet/session/SNTestPacket.h>
 
 
 using namespace simpleNet;
@@ -125,6 +123,14 @@ void testPacketServer() {
         host.sendDataOut();
         host.checkNetwork();
         
+        
+        if(host.isConnectingClient()) {
+            SNTestPacket packet(counter, 10);
+            LOG("SNTestPacket: packet.cmd=%d", packet.cmd);
+            host.sendPacket(packet);
+        }
+        //.sendPacket(packet);
+        
         counter++;
         
        
@@ -145,9 +151,9 @@ void runSingleTest() {
     
     //testSNTestPacket2();
     //testSNTestPacket();
-    //testPacketClient();
+    testPacketClient();   // test with PacketServer
     //testPacketHeader();
-    testPacketServer();
+    //testPacketServer();     // test with PacketClient
     //test1();
     
     std::cout << "End of Single Test\n";

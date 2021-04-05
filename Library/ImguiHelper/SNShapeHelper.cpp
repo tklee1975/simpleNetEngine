@@ -38,5 +38,15 @@ void SNShapeHelper::drawRectAtCenter(
 
 }
 
+void SNShapeHelper::drawCircleAtCenter(
+                        const ImVec2 &center,
+                        const float &radius,
+                        const ImColor &color)
+{
+    auto* drawList = ImGui::GetBackgroundDrawList();
+
+    drawList->AddCircleFilled(center, radius, color);
+}
+
 
 }

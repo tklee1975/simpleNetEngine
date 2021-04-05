@@ -25,6 +25,33 @@ SNNetSession::SNNetSession(SNSocket &&sock)
 }
 
 
+void SNNetSession::onConnect() 
+{
+    _waitForContent = false;
+}
+
+
+bool SNNetSession::sendPacketHeader(u16 len, u32 cmd)
+{
+    SNPacketHeader header;
+    header.len = len;        // 0a
+    header.cmd = cmd;
+    
+    SNVector<u8> buffer;
+    SNBinSerializer se(buffer);
+    
+    header.io(se);
+
+    //SN_DUMP_HEX(buffer);
+    int ret = _mySocket.send(buffer.data(), buffer.size());
+    if(ret <= 0) {
+        return false;
+    }
+    
+    return ret == buffer.size();
+}
+
+
 bool SNNetSession::recvPacketHeader(SNPacketHeader &header)
 {
     int headerLen = header.getDataLength();
@@ -44,10 +71,13 @@ bool SNNetSession::recvPacketHeader(SNPacketHeader &header)
     SNBinDeserializer de(_recvBuffer);
     header.io(de);
     
+    
+    LOG("header received: %s", header.toString().c_str());
+    
     return true;
 }
 
-bool SNNetSession::recvPacket(size_t requiredSize)
+bool SNNetSession::recvPacket(SNPacketHeader::Cmd cmd, size_t requiredSize)
 {
     int ret = _mySocket.recv(_recvBuffer, requiredSize, MSG_PEEK);
     if(ret < requiredSize) { // ken: not enough packets, wait for more
@@ -58,13 +88,16 @@ bool SNNetSession::recvPacket(size_t requiredSize)
     int recvSize = _mySocket.recv(_recvBuffer, requiredSize);
     _recvBuffer.resize(requiredSize);
     
-    onRecvPacketBuffer(_recvBuffer);
+    LOG("Recv Buffer: $d/%d byte received", recvSize, requiredSize);
+    
+    onRecvPacketBuffer(cmd, _recvBuffer);
     
     return true;
 }
 
 void SNNetSession::packetRecvLogic()
 {
+    //LOG("packetRecvLogic");
     const size_t maxPacketPerFrame = 100;
     for (size_t i=0; i<maxPacketPerFrame; i++) {
         size_t nRead = _mySocket.availableBytesToRead();
@@ -72,19 +105,24 @@ void SNNetSession::packetRecvLogic()
             break;  //
         }
         
+        SNPacketHeader header;
         if(_waitForContent == false) {
-            SNPacketHeader header;
+            
             if(recvPacketHeader(header) == false) {
                 continue;
             }
-            _waitForContent = true;
+            
+            //LOG("** recvPack: cmd=%d len=%d", header.cmd, header.len);
+            _waitForContent = header.len > 0 ? true : false;
             _packetContentSize = header.len;
+            _packetCmd = header.cmd;
         } else {
-            if(recvPacket(_packetContentSize) == false) {
+            //LOG("recvPack: cmd=%d len=%d", header.cmd, header.len);
+            if(recvPacket(_packetCmd, _packetContentSize) == false) {
                 continue;
             }
-            
-            onRecvPacketBuffer(_recvBuffer);
+            LOG("packet received");
+            // onRecvPacketBuffer(_recvBuffer);
             
             // Reset
             _waitForContent = false;
@@ -99,24 +137,14 @@ void SNNetSession::onRecvFromSocket()
     packetRecvLogic();
 }
 
-bool SNNetSession::sendPacketHeader(u16 len, u32 cmd)
+bool SNNetSession::sendPacketBuffer(SNPacket &packet)
 {
-    SNPacketHeader header;
-    header.len = len;        // 0a
-    header.cmd = cmd;
+    _sendBuffer.clear();
+    //packet.to
+    packet.toBuffer(_sendBuffer);
     
-    SNVector<u8> buffer;
-    SNBinSerializer se(buffer);
-    
-    header.io(se);
-
-    //SN_DUMP_HEX(buffer);
-    int ret = _mySocket.send(buffer.data(), buffer.size());
-    if(ret <= 0) {
-        return false;
-    }
-    
-    return ret < buffer.size();
+    // Sending the package
+    return sendPacketBuffer(packet.cmd, _sendBuffer);
 }
 
 bool SNNetSession::sendPacketBuffer(
@@ -124,6 +152,7 @@ bool SNNetSession::sendPacketBuffer(
 {
     u16 len = static_cast<u16>(packetBuffer.size());
     sendPacketHeader(len, cmd);
+    LOG("sendPacketData: cmd=%d len=%d", cmd, len);
     int ret = _mySocket.send(packetBuffer.data(), (size_t) len);
     
     if(ret <= 0) {

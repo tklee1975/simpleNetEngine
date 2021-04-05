@@ -42,6 +42,21 @@ inline int my_strcasecmp(const char* a, const char* b) {
 
 
 namespace simpleNet {
+
+// Enum
+template<class T> inline constexpr typename std::underlying_type<T>::type enumInt(T value) {
+    return static_cast<typename std::underlying_type<T>::type>(value);
+}
+
+template<class T> inline constexpr typename std::underlying_type<T>::type &enumIntRef(T& value) {
+    return *reinterpret_cast<typename std::underlying_type<T>::type*>(&value);
+}
+
+template<class T> inline constexpr typename std::underlying_type<T>::type const & enumIntRef(const T& value) { return *reinterpret_cast<const typename std::underlying_type<T>::type*>(&value); }
+
+template<class T> inline bool constexpr enumHas        (const T& a, const T& b) { return static_cast<T>(enumInt(a) & enumInt(b)) != static_cast<T>(0); }
+
+
 //
 
 // Common functions

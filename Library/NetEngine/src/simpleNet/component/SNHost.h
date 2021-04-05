@@ -31,6 +31,7 @@ public:
     //void setSessionFactory(SNSessionFactory *factory);
     bool bindPort(int port);
     void checkNetwork();           // ken: is it a good method name?
+    bool isConnectingClient();
 //    void sendDataOut();
 //    void queueToOutBuffer(SNString &str);
     

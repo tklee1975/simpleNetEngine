@@ -18,10 +18,11 @@ namespace simpleNet {
 const u32 kCmdID = 100;
 
 SNTestPacket::SNTestPacket(i32 _start, i32 _size)
-    : startIndex(_start)
+    : SNPacket()
+    , startIndex(_start)
     , size(_size)
-    , cmd(kCmdID)    
 {
+    cmd = kCmdID;
     _data.resize(_size);
     _data.clear();
     i32 value = startIndex;

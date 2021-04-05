@@ -168,6 +168,11 @@ void SNHost::checkNetworkWhenWaitClient()
     }
 }
 
+bool SNHost::isConnectingClient()
+{
+    return _state == SNHostStatetConnected;
+}
+
 void SNHost::checkNetworkWhenConnect()
 {
     bool isConnected = checkIncomingData();

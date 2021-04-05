@@ -12,17 +12,16 @@
 #include <simpleNet/CoreLib.h>
 namespace simpleNet {
 
-class SNTestPacket {
+class SNTestPacket : public SNPacket {
 public:
-    u32 cmd;
     i32 startIndex = 0;
     i32 size = 0;
     
     SNTestPacket(){}
     SNTestPacket(i32 _start, i32 _size);
     
-    void fromBuffer(const SNVector<u8>& buf);
-    void toBuffer(SNVector<u8>& buf);
+    virtual void fromBuffer(const SNVector<u8>& buf) override;
+    virtual void toBuffer(SNVector<u8>& buf) override;
     std::string toString();
 private:
     SNVector<u16> _data;

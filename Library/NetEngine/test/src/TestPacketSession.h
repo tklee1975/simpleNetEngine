@@ -20,7 +20,8 @@ class TestPacketServerSession : public SNNetSession
 public:
     TestPacketServerSession(SNSocket &&sock);
     
-    virtual void onRecvPacketBuffer(const SNVector<u8> &packetBuffer) override;
+    virtual void onRecvPacketBuffer(const SNPacketHeader::Cmd &cmd,
+                                    const SNVector<u8> &packetBuffer) override;
 //
 //    virtual void onRecvFromSocket() override;
 //
@@ -46,6 +47,8 @@ public:
     TestPacketClientSession(SNSocket &&sock);
     
     virtual void onUpdate() override;
+    virtual void onRecvPacketBuffer(const SNPacketHeader::Cmd &cmd,
+                                    const SNVector<u8> &packetBuffer) override;
     
 //    virtual void onRecvFromSocket() override;
 //    virtual void onConnect() override;

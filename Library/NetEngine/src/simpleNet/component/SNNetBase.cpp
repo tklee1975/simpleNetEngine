@@ -3,7 +3,7 @@
 #include "../SNSessionFactory.h"
 #include "../SNSocket.h"
 #include <iostream>
-
+#include "SNNetSession.h"
 
 namespace simpleNet {
 
@@ -96,5 +96,33 @@ void SNNetBase::sendDataOut()
     _mainSession->flushBuffer();
 }
 
+void SNNetBase::sendPacket(SNPacket &packet)
+{
+    SNSession *ptr = _mainSession.get();
+    SNNetSession *net = static_cast<SNNetSession *>(ptr);
     
+    
+    
+    SNVector<u8> _sendBuffer;
+    _sendBuffer.clear();
+    
+    LOG("1 packet.cmd=%d", packet.cmd);
+    packet.toBuffer(_sendBuffer);
+    LOG("2 packet.cmd=%d", packet.cmd);
+    SN_DUMP_HEX(_sendBuffer);
+    net->sendPacketBuffer(packet.cmd, _sendBuffer);
+    
+    //static_cast<std::unique_ptr<SNNetSession>>(_mainSession);
+    
+    
+    //_mainSession->se
+//    _sendBuffer.clear();
+//    packet.toBuffer(_sendBuffer);
+//
+//    // Sending the package
+//    sendPacketBuffer(packet.cmd, _sendBuffer);
+    //_mainSession(packet.cmd)
+}
+
+
 } // End of Namespace

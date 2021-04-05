@@ -16,14 +16,15 @@ void log(const char *tag, const char * format, ...)
 {
     
     std::cout << tag;
-    //va_list args;
-    
-    // ken: va_list not support in Win 
-    //va_start(args, format);
+#if !_WIN32
+    va_list args;
+    // ken: va_list not support in Win
+    va_start(args, format);
     //std::cout << "Log\n";
-    //_log(format, args);
+    _log(format, args);
 
-    //va_end(args);
+    va_end(args);
+#endif
 }
 
 void _log(const char *format, va_list args)

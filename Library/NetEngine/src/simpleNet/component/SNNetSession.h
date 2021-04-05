@@ -22,18 +22,21 @@ class SNNetSession : public SNSession
 public:
     SNNetSession(SNSocket &&sock);
     
-    
+    bool sendPacketBuffer(SNPacket &packet);
+    bool sendPacketBuffer(u32 cmd, const SNVector<u8> &packetBuffer);
+
     
     
 protected:
     virtual void onRecvFromSocket() override;
                                         // ken: new implementation for packet
+    virtual void onConnect() override;
     
-    virtual void onRecvPacketBuffer(const SNVector<u8> &packetBuffer) {}
+    virtual void onRecvPacketBuffer(
+            const SNPacketHeader::Cmd &cmd, const SNVector<u8> &packetBuffer) {}
     
     
     
-    bool sendPacketBuffer(u32 cmd, const SNVector<u8> &packetBuffer);
     bool sendPacketHeader(u16 len, u32 cmd);
     
 private:
@@ -41,9 +44,10 @@ private:
     SNVector<u8> _sendBuffer;
     bool _waitForContent = false;
     size_t _packetContentSize = 0;
+    SNPacketHeader::Cmd _packetCmd;
 
     bool recvPacketHeader(SNPacketHeader &header);
-    bool recvPacket(size_t requiredSize);
+    bool recvPacket(SNPacketHeader::Cmd cmd, size_t requiredSize);
     void packetRecvLogic();
 };
 

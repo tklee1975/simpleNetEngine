@@ -33,9 +33,11 @@ public:
 
 class SNPacket {
 public:
-   
-    void writeBuffer(const SNVector<u8>& buf);
-    void readBuffer(SNVector<u8>& buf);
+    u32 cmd;
+    
+
+    virtual void fromBuffer(const SNVector<u8>& buf) {}
+    virtual void toBuffer(SNVector<u8>& buf) {}
 };
 
 }

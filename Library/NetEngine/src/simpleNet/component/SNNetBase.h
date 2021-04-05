@@ -13,6 +13,7 @@ class SNSession;
 class SNSocket;
 class SNSocketAddr;
 class SNString;
+class SNPacket;
 
 class SNNetBase {
 public:
@@ -24,7 +25,7 @@ public:
     void sendDataOut();
     void queueToOutBuffer(SNString &str);
     bool checkIncomingData();         // false if connection broken
-    
+    void sendPacket(SNPacket &packet);
 
 protected:
     std::shared_ptr<SNSessionFactory> _factory;

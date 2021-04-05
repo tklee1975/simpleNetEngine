@@ -28,6 +28,12 @@ public:
                             const ImVec2 &center,
                             const float &size,
                             const ImColor &color);
+    
+    static void drawCircleAtCenter(
+                            const ImVec2 &center,
+                            const float &radius,
+                                   const ImColor &color);
+    
 };
 }
 

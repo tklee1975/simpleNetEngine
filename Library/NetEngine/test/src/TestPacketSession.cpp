@@ -88,13 +88,15 @@ TestPacketServerSession::TestPacketServerSession(SNSocket &&sock)
 //    return true;
 //}
 
-void TestPacketServerSession::onRecvPacketBuffer(const SNVector<u8> &packetBuffer)
+void TestPacketServerSession::onRecvPacketBuffer(
+                    const SNPacketHeader::Cmd &cmd, const SNVector<u8> &packetBuffer)
 {
     SNTestPacket packet;    // TODO: ken: determine by header.cmd
     
     packet.fromBuffer(packetBuffer);
     
     // Packet Ready!!
+    std::cout << "Cmd: " << cmd << "\n";
     std::cout << "Packet Ready: " << packet.toString() << "\n";
     
 }
@@ -153,6 +155,22 @@ TestPacketClientSession::TestPacketClientSession(SNSocket &&sock)
 {
     
 }
+
+void TestPacketClientSession::onRecvPacketBuffer(
+            const SNPacketHeader::Cmd &cmd, const SNVector<u8> &packetBuffer)
+
+{
+    SN_DUMP_HEX(packetBuffer);
+    
+    SNTestPacket packet;    // TODO: ken: determine by header.cmd
+    
+    packet.fromBuffer(packetBuffer);
+    
+    // Packet Ready!!
+    std::cout << "Cmd: " << cmd << "\n";
+    std::cout << "Packet Ready: " << packet.toString() << "\n";
+}
+
 //
 //void TestPacketClientSession::sendPacketHeader(u16 len, u32 cmd)
 //{
@@ -179,18 +197,18 @@ TestPacketClientSession::TestPacketClientSession(SNSocket &&sock)
 
 void TestPacketClientSession::onUpdate()
 {
-    std::cout << "onUpdate\n";
-    //sendPacket(counter);
-    
+//    std::cout << "onUpdate\n";
+//    //sendPacket(counter);
+//    
     // Packing the packer
-    SNTestPacket packet(counter, 5);
-    
-    _sendBuffer.clear();
-    packet.toBuffer(_sendBuffer);
-    
-    // Sending the package
-    sendPacketBuffer(packet.cmd, _sendBuffer);
-    
+//    SNTestPacket packet(counter, 5);
+//    
+//    _sendBuffer.clear();
+//    packet.toBuffer(_sendBuffer);
+//    
+//    // Sending the package
+//    sendPacketBuffer(packet.cmd, _sendBuffer);
+//    
     
     counter++;
 }

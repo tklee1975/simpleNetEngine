@@ -30,6 +30,12 @@ then
     exit 0  
 fi
 
+if [ $TEST = "app2" ] 
+then
+    echo "Run Demo App 2"
+    ./build/_DemoApp2/app2 $2 $3 $4
+    exit 0  
+fi
 
 echo "Unknown Test"
 ## Run DemoApp1

@@ -11,6 +11,7 @@ enable_testing()
 ## Variable Setup 
 set(DEMO1_BIN_NAME      "app1")
 set(DEMO1_PATH          "_DemoApp1")
+set(DEMO2_PATH          "_DemoApp2")
 
 set(CORE_LIB_NAME       "CoreLib")
 set(CORE_LIB_PATH       "Library/CoreLib")
@@ -40,6 +41,7 @@ add_subdirectory(${CORE_LIB_TEST_PATH})
 add_subdirectory(${NET_ENGINE_PATH})
 add_subdirectory(${NET_ENGINE_TEST_PATH})
 add_subdirectory(${IMGUI_HELPER_PATH})
+add_subdirectory(${DEMO2_PATH})
 
 
 ## Define 

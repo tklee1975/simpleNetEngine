@@ -60,7 +60,7 @@ namespace simpleNet {
         
         T *typePtr = reinterpret_cast<T *>(p);
         
-        *typePtr = value;
+        *typePtr = LittleEndian::FromHost::get(value);
     }
 }
 #endif

@@ -57,7 +57,7 @@ namespace simpleNet {
         auto* p = _moveCursor(sizeof(value));
         const T *dataPtr = reinterpret_cast<const T *>(p);
         
-        value = *dataPtr;
+        value = LittleEndian::ToHost::get(*dataPtr);
     }
 
 }

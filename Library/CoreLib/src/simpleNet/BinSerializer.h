@@ -60,10 +60,6 @@ namespace simpleNet {
         
         T *typePtr = reinterpret_cast<T *>(p);
         
-<<<<<<< HEAD
-=======
-        ///LittleEndian::f
->>>>>>> ken_dev
         *typePtr = LittleEndian::FromHost::get(value);
     }
 }

@@ -74,9 +74,10 @@ void SNParticleSystem::removeDiedParticle()
     for(;it != _particleList.end(); ) {
         if(it->isAlive()){
             it++;
-            continue;
         }
-        _particleList.erase(it);
+        else {
+            it = _particleList.erase(it);
+        }
     }
 }
 

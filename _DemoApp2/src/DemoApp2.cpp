@@ -73,7 +73,7 @@ void DemoApp2::drawShapes()
 void DemoApp2::createHitParticle(const ImVec2 &pos)
 {
     SNParticle p(1);
-    p.size = 30;
+    p.size = 40;
     p.pos = pos;
     p.color = ImColor(200, 200, 100);
     

@@ -1,5 +1,4 @@
-#ifndef _CORELAB
-#define _CORELAB
+#pragma once
 
 const char KC_CORE_LIB_VERSION[] = "0.0.1";
 
@@ -14,4 +13,3 @@ const char KC_CORE_LIB_VERSION[] = "0.0.1";
 #include "platform/Platform.h"
 #include "ByteOrder.h"
 
-#endif

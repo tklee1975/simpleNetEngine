@@ -10,7 +10,7 @@
 
 
 #include "CoreLib.h"        // ken: Q: is it good?
-
+#include "ByteOrder.h"
 
 namespace simpleNet {
     class SNBinDeserializer : public NonCopyable {

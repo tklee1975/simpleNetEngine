@@ -18,6 +18,8 @@
 
 const int kCmdMove = 100;
 const int kCmdBullet = 101;
+const int kCmdPlayerHit = 102;
+const int kCmdRemoveBullet = 103;
 
 using namespace simpleNet;
 
@@ -46,6 +48,7 @@ public:
         int x;
         int y;
         Dir dir;
+        int score;
     };
     
     struct Bullet {
@@ -55,6 +58,7 @@ public:
         int y;
         i16 speedX;
         i16 speedY;
+        bool isRemote;
         bool isDeleted;
     };
 
@@ -74,7 +78,11 @@ private:
     ImVec2 _posP2;
     Player _player1;
     Player _player2;
+    i8 _currentPid;
+    
+    i32 _bulletID;
     SNVector<Bullet> _bulletList;
+    SNParticleSystem _pSystem;
     
     AppState _state;
     SNHost _host;
@@ -96,8 +104,13 @@ private:
     
     
     void handleInput(double delta);
-    void movePlayer(int pid, ImVec2 change, Dir _dir, bool sendCmd);
+    void movePlayer(i8 pid, ImVec2 change, Dir _dir, bool sendCmd);
+    void hitPlayer(i8 pid);
+    void removeBullet(i8 pid, i32 bulletID);
     void initPlayers();
+    
+    void checkBulletHit();
+    void handleBulletHit(i8 pid, i32 bulletID);
     
     // Gui
     void drawGui();
@@ -110,6 +123,7 @@ private:
     void drawPlayer(const Player &player, const ImColor &color);
     
     void drawShapes();
+    void createHitParticle(const ImVec2 &pos);
     
     // Create room / setup host
     void onCreateRoomClicked();
@@ -127,15 +141,20 @@ private:
     
     void sendMoveCommand(int deltaX, int deltaY, Dir dir);
     void sendBulletCommand(const Bullet &bullet);
+    void sendPlayerHitCommand(i8 pid);
+    void sendRemoveBulletCommand(i8 pid, i32 bulletID);
     
     // Bullet
     void addBulletAtPos(int pid, int x, int y, Dir dir);
     void addBullet(int pid, int x, int y, int speedX, int speedY, bool sendToNet);
+    void addBulletFromNet(i8 pid, i32 bulletID,
+                        int x, int y, int speedX, int speedY);
     void updateBullets(double delta);
     void drawBullet(const Bullet &bullet);
     void drawAllBullets();
     void fireBullet(const Player &player, double delta);
 
+    
     
     bool shouldSendCmd(int pid);
     

@@ -58,7 +58,19 @@ void DemoApp2Session::onRecvPacketBuffer(const SNPacketHeader::Cmd &cmd,
         change.x = packet.x;
         change.y = packet.y;
         
-        mainApp.addBullet(packet.playerID, packet.x, packet.y,
-                          packet.speedX, packet.speedY, false);
+        mainApp.addBulletFromNet(packet.playerID, packet._id,
+                                  packet.x, packet.y,
+                                    packet.speedX, packet.speedY);
+    } else if(cmd == kCmdPlayerHit) {
+        D2PlayerHitPacket packet;
+        packet.fromBuffer(packetBuffer);
+        
+        mainApp.hitPlayer(packet.playerID);
+        
+    } else if(cmd == kCmdRemoveBullet) {
+        D2RemoveBulletPacket packet;
+        packet.fromBuffer(packetBuffer);
+        LOG("RemoveBullet: %s", packet.toString().c_str());
+        mainApp.removeBullet(packet.playerID, packet.bulletID);
     }
 }

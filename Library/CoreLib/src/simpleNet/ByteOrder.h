@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "Type.h"
+#include "platform/Platform.h"
 
 namespace simpleNet {
 
@@ -86,8 +87,9 @@ public:
 
 
 // send to/from host using LittleEndian
-class LittleEndian { // little endian
+class LittleEndian {
 public:
+    
 #if SN_CPU_ENDIAN_LITTLE
     using ToHost   = ByteOrder::Straight;       // No need Swap
     using FromHost = ByteOrder::Straight;
@@ -98,7 +100,7 @@ public:
 };
 
 // send to/from host using BigEndian
-class BigEndian { // little endian
+class BigEndian {
 public:
 #if SN_CPU_ENDIAN_LITTLE
     using ToHost   = ByteOrder::ByteSwap;       // Need Swap
@@ -108,6 +110,7 @@ public:
     using FromHost = ByteOrder::Straight;
 #endif
 };
+
 
 
 // --- Namespace 

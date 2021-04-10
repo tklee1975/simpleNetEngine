@@ -151,9 +151,9 @@ void runSingleTest() {
     
     //testSNTestPacket2();
     //testSNTestPacket();
-    testPacketClient();   // test with PacketServer
+    //testPacketClient();   // test with PacketServer
     //testPacketHeader();
-    //testPacketServer();     // test with PacketClient
+    testPacketServer();     // test with PacketClient
     //test1();
     
     std::cout << "End of Single Test\n";

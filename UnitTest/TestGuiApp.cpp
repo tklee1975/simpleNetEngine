@@ -112,3 +112,67 @@ void SampleGuiApp2::handleInput(double deltaTime)
     _pos.x += dir.x * deltaTime * speed;
     _pos.y += dir.y * deltaTime * speed;
 }
+
+#pragma mark - Sample Particle App
+SampleParticleApp::SampleParticleApp()
+: _pSystem()
+{
+    
+}
+
+
+void SampleParticleApp::onInit()
+{
+    _clearColor = ImVec4(0.0f, 0.0f, 0.10f, 1.00f);
+    
+}
+
+
+void SampleParticleApp::onUpdate(double delta)
+{
+    handleInput(delta);
+    
+    bool flag;
+    
+    _pSystem.onUpdate(delta);
+    
+    SNShapeHelper::drawCircleAtCenter(ImVec2(100, 100), 2, ColorRed);
+    
+    ImGui::Begin("Testing", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    if(ImGui::Button("Fire Particle")) {
+        SNParticle p(1);
+        p.pos = ImVec2(200, 120);
+        LOG("Add particle!!");
+        _pSystem.addParticle(p);
+    }
+    ImGui::End();
+//    ImGui::ShowDemoWindow(&flag);
+//
+//    // A new window
+//    ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+//
+//    ImGui::Text("This is some useful text.");   // Label inside the window
+//
+//    ImGui::End();
+    
+    //
+    
+}
+
+void SampleParticleApp::handleInput(double deltaTime)
+{
+
+    if (getInputKey(SDLK_a)) {
+        
+        LOG("a key is pressed");
+        
+        //SNParticle p(1);
+        //p.pos = ImVec2(120, 120);
+        
+        //_pSystem.addParticle(p);
+    }
+//    if (getInputKey(SDLK_w)) dir.y -= 1;
+//    if (getInputKey(SDLK_s)) dir.y += 1;
+//    if (getInputKey(SDLK_a)) dir.x -= 1;
+//    if (getInputKey(SDLK_d)) dir.x += 1;
+}

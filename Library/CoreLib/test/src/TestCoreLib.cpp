@@ -26,6 +26,7 @@ void testEnumInt() {
 
 void testEndian()
 {
+
 #if SN_CPU_ENDIAN_LITTLE
     fmt::print("Using Little Endian now\n");
 #elif SN_CPU_ENDIAN_BIG
@@ -34,19 +35,21 @@ void testEndian()
     i16 v16 = 0x1234;
     
     fmt::print("Testing Big Endian\n");
+
+    
     i16 toHost = BigEndian::ToHost::get(v16);
     i16 fromHost = BigEndian::FromHost::get(toHost);
-    
-    
+
+
     fmt::print("Normal    : {:x}\n", v16);
     fmt::print("toHost    : {:x}\n", toHost);
     fmt::print("fromHost  : {:x}\n", fromHost);
-    
-    
+
+
     fmt::print("Testing Little Endian\n");
     toHost = LittleEndian::ToHost::get(v16);
     fromHost = LittleEndian::FromHost::get(toHost);
-    
+
     
     fmt::print("Normal    : {:x}\n", v16);
     fmt::print("toHost    : {:x}\n", toHost);
@@ -246,8 +249,8 @@ void test1() {
 void runSingleTest() {
     std::cout << "Run Single Test\n";
     
-    testEnumInt();
-    // testEndian();
+    // testEnumInt();
+    testEndian();
     // testPlatformVersion();
     // testByteWrap();
     // testDumpHex();

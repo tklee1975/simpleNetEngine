@@ -18,6 +18,20 @@ using namespace simpleNet;
 
 const int kPort = 4567;
 
+const ImVec2 kP1BornPos(600, 50);
+const ImVec2 kP2BornPos(50, 600);
+const float kBulletSpeed = 350;
+//const float kBulletSpeed = 50;
+const float kBulletRadius = 10;
+const float kTankSize = 20;
+
+
+constexpr float square(float in) {
+    return in * in;
+}
+
+const float kCheckHitSqr = square(kBulletRadius+ kTankSize);
+
 DemoApp2::DemoApp2()
 {
     _host.setSessionFactory(make_shared<DemoApp2SessionFactory>(*this, true));    // ken: is '*this' is used how to get my reference?
@@ -25,19 +39,23 @@ DemoApp2::DemoApp2()
     
     _errorMsg = SNString("");
     initPlayers();
+    _bulletID = 1;
+    _currentPid = 0;
 }
 
 
 void DemoApp2::initPlayers()
 {
     _player1._id = 0;
-    _player1.x = 100;
-    _player1.y = 100;
+    _player1.x = kP1BornPos.x;
+    _player1.y = kP1BornPos.y;
+    _player1.score = 0;
     _player1.dir = Dir::Down;
     
     _player2._id = 1;
-    _player2.x = 100;
-    _player2.y = 400;
+    _player2.x = kP2BornPos.x;
+    _player2.y = kP2BornPos.y;
+    _player2.score = 0;
     _player2.dir = Dir::Up;
 }
 
@@ -50,6 +68,17 @@ void DemoApp2::drawShapes()
     
     SNShapeHelper::drawRectAtCenter(_posP2, 30, ColorPurple);
     //SNShapeHelper::drawRectAtCenter(ImVec2(100, 250), 50, ImColor(0, 255, 0));
+}
+
+void DemoApp2::createHitParticle(const ImVec2 &pos)
+{
+    SNParticle p(1);
+    p.size = 30;
+    p.pos = pos;
+    p.color = ImColor(200, 200, 100);
+    
+    LOG("Add particle!!");
+    _pSystem.addParticle(p);
 }
 
 
@@ -103,6 +132,7 @@ void DemoApp2::onUpdate(double delta)
          onUpdateConnected(delta);
      } else if(AppState::Test == _state) {
          updateBullets(delta);
+         checkBulletHit();
      }
 
     drawGui();
@@ -112,6 +142,8 @@ void DemoApp2::onUpdate(double delta)
     drawPlayer(_player1, ColorRed);
     drawPlayer(_player2, ColorYellow);
     drawAllBullets();
+    
+    _pSystem.onUpdate(delta);
 }
 
 
@@ -216,7 +248,15 @@ void DemoApp2::drawGuiCreateHost()
 
 void DemoApp2::drawGuiTest()
 {
+    
     ImGui::Text("Testing");
+
+    fmt::memory_buffer out;
+    format_to(out, "Player 1: {}  Player 2: {}",
+                    _player1.score, _player2.score);
+    ImGui::Text("%s", out.data());
+    //fmt
+    
     
     if (ImGui::Button("Back to main")) {
         //std::cout << "'Button A' is clicked\n";
@@ -241,11 +281,23 @@ void DemoApp2::drawGuiTest()
         addBulletAtPos(1, 422, 222, Dir::Left);
         //addBullet(1, 444, 111, 0, 500);
     }
-
-
     
-//    _player1.x = 222;
-//    _player1.y = 333;
+    if (ImGui::Button("Hit Player 0")) {
+        hitPlayer(0);
+        //addBullet(1, 444, 111, 0, 500);
+    }
+    
+    if (ImGui::Button("Hit Player 1")) {
+        hitPlayer(1);
+    }
+    
+    if (ImGui::Button("Remove Bullet")) {
+        removeBullet(0, _bulletID-5);
+    }
+
+    if (ImGui::Button("Check Hit")) {
+        checkBulletHit();
+    }
     
     drawPlayer(_player1, ColorRed);
     drawPlayer(_player2, ColorYellow);
@@ -288,8 +340,10 @@ void DemoApp2::drawGuiConnected()
 {
     ImGui::Text("Players are connected");
     ImGui::Text(_isHost ? "You are the host" : "You are the guest");
-    ImGui::Text("Player 1 (%f, %f)", _posP1.x, _posP1.y);
-    ImGui::Text("Player 2 (%f, %f)", _posP2.x, _posP2.y);
+    ImGui::Text("Player 1 >> Score: %d  Pos: (%d, %d)",
+                _player1.score, _player1.x, _player1.y);
+    ImGui::Text("Player 2 >> Score: %d  Pos: (%d, %d)",
+                _player2.score, _player2.x, _player2.y);
 }
 
 
@@ -315,7 +369,7 @@ void DemoApp2::drawGui()
     ImGui::End();
 }
 
-void DemoApp2::movePlayer(int pid, ImVec2 change, Dir dir, bool sendCmd)
+void DemoApp2::movePlayer(i8 pid, ImVec2 change, Dir dir, bool sendCmd)
 {
     //ImVec2 &pos = (pid == 0) ? _posP1 : _posP2;
     int deltaX = (int) change.x;
@@ -404,6 +458,8 @@ void DemoApp2::onConnected()
 {
     _state = AppState::Connected;
     _cmdCounter = 0;
+    _bulletID = 1;
+    _currentPid = _isHost ? 0 : 1;
 }
 
 void DemoApp2::onUpdateWaitClient(double delta)
@@ -419,6 +475,7 @@ void DemoApp2::onUpdateWaitClient(double delta)
 void DemoApp2::onUpdateConnected(double delta)
 {
     updateBullets(delta);
+    checkBulletHit();
     
      if(_isHost) {
          _host.sendDataOut();
@@ -435,7 +492,7 @@ void DemoApp2::sendMoveCommand(int deltaX, int deltaY, Dir dir)
     
     D2MovePacket packet;
     
-    packet.playerID = _isHost ? 0 : 1;
+    packet.playerID = _currentPid;
     packet.x = deltaX;
     packet.y = deltaY;
     packet.dir = enumInt(dir);
@@ -447,6 +504,33 @@ void DemoApp2::sendMoveCommand(int deltaX, int deltaY, Dir dir)
     }
 }
 
+void DemoApp2::sendPlayerHitCommand(i8 pid)
+{
+    D2PlayerHitPacket packet;
+    packet.playerID = pid;
+    
+    if(_isHost) {
+        _host.sendPacket(packet);
+    } else {
+        _client.sendPacket(packet);
+    }
+}
+
+void DemoApp2::sendRemoveBulletCommand(i8 pid, i32 bulletID)
+{
+    D2RemoveBulletPacket packet;
+    packet.playerID = pid;
+    packet.bulletID = bulletID;
+    LOG("Send RemoveBullet: %s", packet.toString().c_str());
+    
+    if(_isHost) {
+        _host.sendPacket(packet);
+    } else {
+        _client.sendPacket(packet);
+    }
+}
+
+
 
 void DemoApp2::sendBulletCommand(const Bullet &bullet)
 {
@@ -455,6 +539,7 @@ void DemoApp2::sendBulletCommand(const Bullet &bullet)
     D2BulletPacket packet;
     
     packet.playerID = bullet.pid;
+    packet._id = bullet._id;
     packet.x = bullet.x;
     packet.y = bullet.y;
     packet.speedX = bullet.speedX;
@@ -477,6 +562,7 @@ void DemoApp2::fireBullet(const Player &player, double delta)
     }
     
     addBulletAtPos(player._id, player.x, player.y, player.dir);
+    
 
     _fireCooldown = 0.5;  // 1 sec
 //
@@ -498,7 +584,7 @@ bool DemoApp2::shouldSendCmd(int pid)
 void DemoApp2::addBulletAtPos(int pid, int x, int y, Dir dir)
 {
     int offsetValue = 10;
-    int speedValue = 500;
+    int speedValue = kBulletSpeed;
     
     ImVec2 offset;
     ImVec2 speed;
@@ -515,6 +601,24 @@ void DemoApp2::addBulletAtPos(int pid, int x, int y, Dir dir)
     addBullet(pid, x + offset.x, y + offset.y, speed.x, speed.y, shouldSendCmd(pid));
 }
 
+void DemoApp2::addBulletFromNet(i8 pid, i32 bulletID,
+                                int x, int y, int speedX, int speedY)
+{
+    Bullet bullet;
+    bullet.pid = pid;
+    bullet._id = bulletID;
+    bullet.x = x;
+    bullet.y = y;
+    bullet.speedX = speedX;
+    bullet.speedY = speedY;
+    bullet.isRemote = true;
+    bullet.isDeleted = false;
+    
+
+    _bulletList.push_back(bullet);
+    
+}
+
 void DemoApp2::addBullet(int pid, int x, int y,
                         int speedX, int speedY, bool sendToNet)
 {
@@ -524,10 +628,10 @@ void DemoApp2::addBullet(int pid, int x, int y,
     bullet.y = y;
     bullet.speedX = speedX;
     bullet.speedY = speedY;
+    bullet.isRemote = false;
     bullet.isDeleted = false;
     
-    int size = _bulletList.size();
-    bullet._id = size+1;
+    bullet._id = _bulletID++;
 
     _bulletList.push_back(bullet);
     
@@ -565,5 +669,96 @@ void DemoApp2::drawBullet(const Bullet &bullet)
     ImColor color = bullet.pid == 0 ? ColorRed : ColorYellow;
     //LOG("drawBullet!!");
     auto pos = ImVec2(bullet.x, bullet.y);
-    SNShapeHelper::drawCircleAtCenter(pos, 10, color);
+    SNShapeHelper::drawCircleAtCenter(pos, kBulletRadius, color);
 }
+
+#pragma mark - Hit handling
+void DemoApp2::hitPlayer(i8 pid)
+{
+    //LOG("hitPlayer");
+    // fmt::print("HitPlayer {}\n", pid);
+    
+    auto & player = pid == 0 ? _player1 : _player2;
+    player.score++;
+    
+    
+    createHitParticle(ImVec2(player.x, player.y));
+    
+    if(pid == 0) {
+        player.x = kP1BornPos.x;
+        player.y = kP1BornPos.y;
+    } else {
+        player.x = kP2BornPos.x;
+        player.y = kP2BornPos.y;
+    }
+}
+
+void DemoApp2::removeBullet(i8 pid, i32 bulletID)
+{
+    //SNVector<Bullet> _bulletList;
+    LOG("removeBullet: pid=%d bulletID=%ld", pid, bulletID);
+    auto it = _bulletList.begin();
+    for(;it != _bulletList.end();) {
+        LOG("removeBullet: check [%d , %ld]", it->pid, it->_id);
+        if(it->pid == pid && it->_id == bulletID) {
+            LOG("RemoveBullet: found the instance!!");
+            _bulletList.erase(it);
+            break;
+        } else {
+            it++;
+        }
+    }
+}
+
+void DemoApp2::checkBulletHit()
+{
+    auto &otherPlayer = _currentPid == 0 ? _player2 : _player1;
+    
+    //float radius2 = kB
+    //LOG("otherPlayerID=%d", otherPlayer._id);
+    
+    // only check the player on this side
+    auto it = _bulletList.begin();
+    
+    auto hitBulletIter =_bulletList.end();
+    
+    for(;it != _bulletList.end(); it++) {
+        auto bullet = *it;
+        
+        //LOG("bulletID=%d otherPlayerID=%d", bullet.pid, otherPlayer._id);
+        if(bullet.pid == otherPlayer._id) {     // ignore my bullet
+            continue;
+        }
+        
+        if(bullet.isRemote) {
+            continue;
+        }
+        
+        float dist = square(bullet.x - otherPlayer.x)
+                        + square(bullet.y - otherPlayer.y);
+        //LOG("dist=%f check=%f", dist, kCheckHitSqr);
+        if(dist < kCheckHitSqr){
+            hitBulletIter = it;
+            break;
+        }
+    }
+    
+    if(hitBulletIter == _bulletList.end()) {
+        return; // No Hit Bullet
+    }
+    
+    Bullet hitBullet = *hitBulletIter;
+    handleBulletHit(otherPlayer._id, hitBullet._id);
+    
+    _bulletList.erase(hitBulletIter);
+    sendRemoveBulletCommand(hitBullet.pid, hitBullet._id);
+}
+
+void DemoApp2::handleBulletHit(i8 pid, i32 bulletID)
+{
+    hitPlayer(pid);
+    
+    sendPlayerHitCommand(pid);
+    // sendRemoveBulletCommand
+}
+

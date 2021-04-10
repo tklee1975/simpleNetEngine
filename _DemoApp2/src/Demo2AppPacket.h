@@ -11,16 +11,8 @@
 #include <simpleNet/NetEngine.h>
 
 using namespace simpleNet;
-//struct Bullet {
-//    int _id;
-//    i8 pid;
-//    int x;
-//    int y;
-//    i16 speedX;
-//    i16 speedY;
-//    bool isDeleted;
-//};
 
+#pragma mark - Bullet
 //
 class D2BulletPacket : public SNPacket {
 public:
@@ -38,11 +30,37 @@ public:
     virtual void fromBuffer(const SNVector<u8>& buf) override;
     virtual void toBuffer(SNVector<u8>& buf) override;
     std::string toString();
-private:
-    SNVector<u16> _data;
+};
+
+#pragma mark - Player Hit
+class D2PlayerHitPacket : public SNPacket {
+public:
+
+    i8 playerID = 0;
+   
+    D2PlayerHitPacket();
+
+    virtual void fromBuffer(const SNVector<u8>& buf) override;
+    virtual void toBuffer(SNVector<u8>& buf) override;
+    std::string toString();
+};
+
+#pragma mark - Remove Bullet
+class D2RemoveBulletPacket : public SNPacket {
+public:
+
+    i8 playerID = 0;
+    i32 bulletID = 0;
+   
+    D2RemoveBulletPacket();
+
+    virtual void fromBuffer(const SNVector<u8>& buf) override;
+    virtual void toBuffer(SNVector<u8>& buf) override;
+    std::string toString();
 };
 
 
+#pragma mark - Player Move
 class D2MovePacket : public SNPacket {
 public:
     
@@ -56,6 +74,4 @@ public:
     virtual void fromBuffer(const SNVector<u8>& buf) override;
     virtual void toBuffer(SNVector<u8>& buf) override;
     std::string toString();
-private:
-    SNVector<u16> _data;
 };

@@ -10,7 +10,7 @@
 
 
 #include "CoreLib.h"        // ken: Q: is it good?
-
+#include "ByteOrder.h"
 
 namespace simpleNet {
     class SNBinDeserializer : public NonCopyable {
@@ -57,7 +57,7 @@ namespace simpleNet {
         auto* p = _moveCursor(sizeof(value));
         const T *dataPtr = reinterpret_cast<const T *>(p);
         
-        value = *dataPtr;
+        value = LittleEndian::ToHost::get(*dataPtr);
     }
 
 }

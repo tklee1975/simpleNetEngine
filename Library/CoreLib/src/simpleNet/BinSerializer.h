@@ -10,7 +10,7 @@
 #define _BIN_SERIALIZER
 
 #include "CoreLib.h"        // ken: Q: is it good?
-
+#include "ByteOrder.h"
 
 namespace simpleNet {
     class SNBinSerializer : public NonCopyable {
@@ -60,7 +60,8 @@ namespace simpleNet {
         
         T *typePtr = reinterpret_cast<T *>(p);
         
-        *typePtr = value;
+        ///LittleEndian::f
+        *typePtr = LittleEndian::FromHost::get(value);
     }
 }
 #endif

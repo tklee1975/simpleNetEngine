@@ -231,6 +231,17 @@ void testImguiApp2() {
 }
 
 
+
+void testParticleApp() {
+    SampleParticleApp app = SampleParticleApp();
+    if(app.init() == false) {
+        std::cout << "Fail to init\n";
+        return;
+    }
+    
+    app.run();
+}
+
 void testSimpleNetApp()
 {
     SimpleNetApp app = SimpleNetApp();
@@ -257,9 +268,10 @@ void runSingleTest() {
     std::cout << "Run Single Test\n";
     
     // testSimpleNetApp();
+    testParticleApp();
     // testImguiApp2();
     // testImguiApp1();
-    testBaseImguiApp();
+    // testBaseImguiApp();
     // testImgui();
     //testLog();
     // test1();
